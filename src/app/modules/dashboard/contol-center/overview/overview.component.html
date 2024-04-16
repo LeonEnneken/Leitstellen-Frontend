@@ -1,0 +1,202 @@
+<div class="flex flex-col flex-auto w-full sm:px-8">
+  <div class="flex flex-wrap w-full max-w-screen-xl mx-auto pt-8 pb-8">
+    <div class="flex items-center justify-between w-full mb-8">
+      <div>
+        <div class="text-3xl font-semibold tracking-tight leading-8">
+          Leitstelle Übersicht
+        </div>
+        <div class="font-medium tracking-tight text-secondary">
+          Hier gibt es alle Details im Überblick!
+        </div>
+      </div>
+    </div>
+
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full min-w-0" *ngIf="settings" @fadeIn>
+      
+      <div class="sm:col-span-1 lg:col-span-2">
+        <div class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden" *ngIf="hasPermissions('CONTROL_CENTERS_SHOW')">
+          <div class="flex flex-col m-6 mb-0">
+            <div class="text-lg font-medium tracking-tight leading-6 truncate">
+              Mitarbeiter im Dienst
+            </div>
+            <div class="font-medium text-secondary">
+              Derzeit sind {{onDuty.length}} im Dienst.
+            </div>
+          </div>
+
+          <div class="flex flex-col flex-auto m-6">
+            <fuse-alert [appearance]="'soft'" [type]="'success'" [showIcon]="false" *ngIf="onDuty.length === 0">
+              Keine Mitarbeiter im Dienst!
+            </fuse-alert>
+
+            <div class="flex flex-col flex-auto overflow-x-auto" *ngIf="onDuty.length !== 0">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="font-mono text-center">Name</th>
+                    <th class="font-mono text-center hidden md:table-cell">Rang</th>
+                    <th *ngIf="settings.options?.hasDutyNumber" class="font-mono text-center hidden md:table-cell">Dienstnummer</th>
+                    <th class="font-mono text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let member of onDuty">
+                    <td class="font-mono text-md text-secondary items-center text-center" (click)="openDialog(member)">
+                      {{ member.firstName }} {{ member.lastName }}
+                    </td>
+                    <td class="font-mono text-md text-secondary items-center text-center hidden md:table-cell" (click)="openDialog(member)">
+                      {{ getGroup(member) }}
+                    </td>
+                    <td *ngIf="settings.options?.hasDutyNumber" class="font-mono text-md text-secondary items-center text-center hidden md:table-cell" (click)="openDialog(member)">
+                      {{ member.dutyNumber ? member.dutyNumber : 'Nicht vorhanden' }}
+                    </td>
+                    <td class="font-mono text-md text-secondary text-center" (click)="openDialog(member)">
+                      <span *ngIf="member.controlCenter?.id !== null" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase" [ngClass]="{'bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50': member.controlCenter.type === 'PAUSE', 'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': member.controlCenter.type !== 'PAUSE'}">
+                        <span class="leading-relaxed whitespace-nowrap">
+                          {{member.controlCenter.label}}
+                        </span>
+                      </span>
+                      <span *ngIf="member.controlCenter?.id === null" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50">
+                        <span class="leading-relaxed whitespace-nowrap">
+                          Nicht eingetragen
+                        </span>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden" *ngIf="hasPermissions('CONTROL_CENTERS_SHOW')">
+          <div class="flex flex-col m-6 mb-0">
+            <div class="text-lg font-medium tracking-tight leading-6 truncate">
+              Mitarbeiter außer Dienst
+            </div>
+            <div class="font-medium text-secondary">
+              Derzeit sind {{offDuty.length}} außer Dienst.
+            </div>
+          </div>
+
+          <div class="flex flex-col flex-auto m-6">
+            <fuse-alert [appearance]="'soft'" [type]="'success'" [showIcon]="false" *ngIf="offDuty.length === 0">
+              Keine Mitarbeiter außer Dienst!
+            </fuse-alert>
+
+            <div class="flex flex-col flex-auto overflow-x-auto" *ngIf="offDuty.length !== 0">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="font-mono text-center">Name</th>
+                    <th class="font-mono text-center hidden md:table-cell">Rang</th>
+                    <th class="font-mono text-center hidden md:table-cell">Dienstnummer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let member of offDuty">
+                    <td class="font-mono text-md text-secondary items-center text-center" (click)="openDialog(member)">
+                      {{ member.firstName }} {{ member.lastName }}
+                    </td>
+                    <td class="font-mono text-md text-secondary items-center text-center hidden md:table-cell" (click)="openDialog(member)">
+                      {{ getGroup(member) }}
+                    </td>
+                    <td class="font-mono text-md text-secondary items-center text-center hidden md:table-cell" (click)="openDialog(member)">
+                      {{ member.dutyNumber ? member.dutyNumber : 'Nicht vorhanden' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden" *ngIf="hasPermissions('CONTROL_CENTERS_SHOW')">
+          <div class="flex flex-col m-6 mb-0">
+            <div class="text-lg font-medium tracking-tight leading-6 truncate">
+              Mitarbeiter AFK / AFK-Bot
+            </div>
+            <div class="font-medium text-secondary">
+              Derzeit sind {{awayFromKeyboard.length}} AFK.
+            </div>
+          </div>
+
+          <div class="flex flex-col flex-auto m-6">
+            <fuse-alert [appearance]="'soft'" [type]="'success'" [showIcon]="false" *ngIf="awayFromKeyboard.length === 0">
+              Keine Mitarbeiter sind AFK!
+            </fuse-alert>
+
+            <div class="flex flex-col flex-auto overflow-x-auto" *ngIf="awayFromKeyboard.length !== 0">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="font-mono text-center">Name</th>
+                    <th class="font-mono text-center hidden md:table-cell">Rang</th>
+                    <th class="font-mono text-center hidden md:table-cell">Dienstnummer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let member of awayFromKeyboard">
+                    <td class="font-mono text-md text-secondary items-center text-center" (click)="openDialog(member)">
+                      {{ member.firstName }} {{ member.lastName }}
+                    </td>
+                    <td class="font-mono text-md text-secondary items-center text-center hidden md:table-cell" (click)="openDialog(member)">
+                      {{ getGroup(member) }}
+                    </td>
+                    <td class="font-mono text-md text-secondary items-center text-center hidden md:table-cell" (click)="openDialog(member)">
+                      {{ member.dutyNumber ? member.dutyNumber : 'Nicht vorhanden' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sm:col-span-1 lg:col-span-1 grid grid-cols-1 gap-y-6" *ngIf="hasPermissions('RADIO_CODES_SHOW')">
+        <div class="sm:col-span-2 flex flex-col">
+          <div class="flex flex-col bg-card shadow rounded-2xl overflow-hidden">
+            <div class="flex flex-col m-6 mb-0">
+              <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                Funk Codes
+              </div>
+              <div class="font-medium text-secondary">
+                Alle derzeitigen Funk Codes im Überblick!
+              </div>
+            </div>
+  
+            <div class="flex flex-col flex-auto m-6">
+              <div class="flex flex-col flex-auto overflow-x-auto">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="font-mono text-center">Code</th>
+                      <th class="font-mono text-center">Beschreibung</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let radioCode of radioCodes">
+                      <td class="font-mono text-md text-secondary items-center text-center">
+                        <span class="inline-flex items-center font-bold text-s px-2.5 py-0.5 rounded-full tracking-wide uppercase" [ngClass]="getRadioCodeStyle(radioCode)">
+                          <span class="leading-relaxed whitespace-nowrap">
+                            {{ radioCode.code }}
+                          </span>
+                        </span>
+                      </td>
+                      <td class="font-mono text-md text-secondary items-center text-center">
+                        {{ radioCode.description }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

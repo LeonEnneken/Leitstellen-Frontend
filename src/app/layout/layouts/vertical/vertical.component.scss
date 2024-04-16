@@ -1,0 +1,17 @@
+.spacer {
+  border-left-width: 1px;
+  border-right-width: 1px;
+
+  opacity: 0.5;
+  border-style: solid;
+  border-color: rgba(var(--fuse-border-rgb), var(--tw-border-opacity));
+
+  height: 30px;
+
+}
+
+.text-xs {
+  a {
+    font-size: 0.75rem !important;
+  }
+}

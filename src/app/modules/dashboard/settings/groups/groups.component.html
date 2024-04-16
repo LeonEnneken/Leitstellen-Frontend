@@ -1,0 +1,336 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+
+  <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+    <div class="ml-2 lg:ml-0 tracking-tight leading-none">
+      <div class="mr-4 text-2xl text-lg font-medium tracking-tight leading-6 truncate">
+        Ränge verwalten
+      </div>
+      <div class="mt-2 text-1xl text-secondary font-medium">
+        Hier kannst du die Ränge verwalten
+      </div>
+    </div>
+
+    <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+      <button class="ml-4" mat-flat-button [color]="'primary'" [disabled]="newItem" (click)="create()">
+        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+        <span class="ml-2 mr-1">Neuen Rang erstellen</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-auto overflow-hidden">
+    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+      <ng-container *ngIf="groups?.length > 0; else noRecords">
+        <div class="grid">
+          <div class="groups-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary">
+            <div class="title">Rang ID</div>
+            <div class="title">Rang Name</div>
+            <div class="title">Division</div>
+            <div class="hidden sm:block">Bearbeiten</div>
+          </div>
+
+          <ng-container>
+            <ng-container *ngFor="let item of groups; let i = index; trackBy: trackByFn">
+              <div class="groups-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b">
+                <div class="truncate">
+                  {{item.uniqueId}}.
+                </div>
+
+                <div class="truncate">
+                  {{item.name}}
+                </div>
+
+                <div class="truncate">
+                  {{item.division}}
+                </div>
+
+                <div>
+                  <button class="min-w-10 min-h-7 h-7 px-2 leading-6" mat-stroked-button (click)="toggleEdit(item.id)">
+                    <mat-icon class="icon-size-5" [svgIcon]="selected?.id === item.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                    </mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid">
+                <ng-container *ngIf="selected?.id === item.id">
+                  <ng-container *ngTemplateOutlet="rowEditTemplate; context: {$implicit: item}">
+
+                  </ng-container>
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </ng-container>
+
+      <ng-template #rowEditTemplate let-group>
+        <div class="shadow-lg overflow-hidden">
+          <div class="flex border-b">
+            <form class="flex flex-col w-full" [formGroup]="selectedForm">
+              <div class="flex flex-col sm:flex-row p-8">
+                <div class="flex flex-auto flex-wrap">
+                  <div class="flex flex-col w-full lg:w-1/4 sm:px-2">
+                    <mat-form-field class="w-full">
+                      <mat-label>ID:</mat-label>
+                      <input matInput type="number" [formControlName]="'uniqueId'" required />
+                    </mat-form-field>
+                  </div>
+
+                  <div class="flex flex-col w-full lg:w-1/4 sm:px-2">
+                    <mat-form-field class="w-full">
+                      <mat-label>Name:</mat-label>
+                      <input matInput [formControlName]="'name'" required />
+                    </mat-form-field>
+                  </div>
+
+                  <div class="flex flex-col w-full lg:w-1/4 sm:px-2">
+                    <mat-form-field class="w-full">
+                      <mat-label>Division:</mat-label>
+                      <input matInput [formControlName]="'division'" />
+                    </mat-form-field>
+                  </div>
+
+                  <div class="flex flex-col w-full lg:w-1/4 sm:px-2">
+                    <div class="mb-3 leading-6 cursor-pointer" (click)="showInOverview.toggle()">
+                      In Übersicht anzeigen?
+                    </div>
+
+                    <mat-slide-toggle class="ml-2" [color]="'primary'" [formControlName]="'showInOverview'" #showInOverview>
+
+                    </mat-slide-toggle>
+                  </div>
+
+                  <mat-expansion-panel class="my-2 w-full">
+                    <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                      <mat-panel-title>
+                        Rang Informationen
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-col sm:flex-row">
+                      <div class="flex flex-auto flex-wrap">
+                        <div class="flex flex-col w-full sm:px-2">
+                          <mat-form-field class="w-full">
+                            <mat-label>Neue Befugnisse für den Dienst:</mat-label>
+                            <textarea matInput name="servicePowers" rows="4" [(ngModel)]="selected.data.servicePowers" [ngModelOptions]="{standalone: true}">
+                            </textarea>
+                          </mat-form-field>
+                        </div>
+                        <div class="flex flex-col w-full sm:px-2">
+                          <mat-form-field class="w-full">
+                            <mat-label>Prüfungen/Voraussetzungen für den nächsten Rang:</mat-label>
+                            <textarea matInput name="examsNextRank" rows="4" [(ngModel)]="selected.data.examsNextRank" [ngModelOptions]="{standalone: true}">
+                            </textarea>
+                          </mat-form-field>
+                        </div>
+                        <div class="flex flex-col w-full sm:px-2">
+                          <mat-form-field class="w-full">
+                            <mat-label>Zusätzliche Genehmigungen:</mat-label>
+                            <textarea matInput name="additionalPermits" rows="4" [(ngModel)]="selected.data.additionalPermits" [ngModelOptions]="{standalone: true}">
+                            </textarea>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+
+                  <mat-expansion-panel class="my-2 w-full">
+                    <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                      <mat-panel-title>
+                        Berechtigungen
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="w-full grid grid-cols-3 gap-3">
+                      <div class="flex flex-col p-6" *ngFor="let permission of permissions">
+                        <mat-label class="mb-2">{{permission.title}}:</mat-label>
+
+                        <div class="flex flex-col">
+                          <mat-checkbox matInput (change)="changePermissions(item.value, $event)" [checked]="checkPermission(item.value)" [color]="'primary'" class="mb-2" *ngFor="let item of permission.items">
+                            {{item.name}}
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex self-end flex-row justify-between w-full sm:pl-8">
+                      <button mat-flat-button [color]="'primary'" (click)="selectAllPermissions()">
+                        Alle Berechtigungen vergeben
+                      </button>
+
+                      <button mat-flat-button [color]="'warn'" (click)="unselectAllPermissions()">
+                        Alle Berechtigungen entziehen
+                      </button>
+                    </div>
+                  </mat-expansion-panel>
+
+                  <mat-expansion-panel class="my-2 w-full">
+                    <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                      <mat-panel-title>
+                        Kleiderordnung
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-auto flex-wrap">
+                      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+                        <label class="mb-2">Kleiderordnung Männer:</label>
+
+                        <drag-and-drop [currentUri]="selected?.data?.maleClothing" (selected)="fileBrowseHandler('maleClothing', $event)">
+
+                        </drag-and-drop>
+
+                        <mat-form-field class="mt-2 w-full">
+                          <mat-label>Beschreibung:</mat-label>
+                          <input matInput name="maleClothingDescription" [(ngModel)]="selected.data.maleClothingDescription" [ngModelOptions]="{standalone: true}"/>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+                        <label class="mb-2">Kleiderordnung Frauen:</label>
+
+                        <drag-and-drop [currentUri]="selected?.data?.femaleClothing" (selected)="fileBrowseHandler('femaleClothing', $event)">
+
+                        </drag-and-drop>
+
+                        <mat-form-field class="mt-2 w-full">
+                          <mat-label>Beschreibung:</mat-label>
+                          <input matInput name="femaleClothingDescription" [(ngModel)]="selected.data.femaleClothingDescription" [ngModelOptions]="{standalone: true}"/>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+
+                  <mat-expansion-panel class="my-2 w-full">
+                    <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                      <mat-panel-title>
+                        Waffenordnung
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-auto flex-wrap">
+                      <div *ngFor="let equipment of selected.data.equipments" class="flex flex-col w-full lg:w-1/4 lg:px-2 sm:px-4">
+                        <mat-form-field class="w-full">
+                          <mat-label>{{equipment.name}}:</mat-label>
+                          <input matInput type="number" min="0" name="amount" [(ngModel)]="equipment.amount" [ngModelOptions]="{standalone: true}" />
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+
+                  <mat-expansion-panel class="my-2 w-full">
+                    <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                      <mat-panel-title>
+                        Event Bekleidung
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-auto flex-wrap">
+                      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+                        <label class="mb-2">Männliche Bekleidung:</label>
+
+                        <drag-and-drop [currentUri]="selected?.data?.maleClothingEvent" (selected)="fileBrowseHandler('maleClothingEvent', $event)">
+
+                        </drag-and-drop>
+
+                        <mat-form-field class="mt-2 w-full">
+                          <mat-label>Beschreibung:</mat-label>
+                          <input matInput name="maleClothingEventDescription" [(ngModel)]="selected.data.maleClothingEventDescription" [ngModelOptions]="{standalone: true}"/>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+                        <label class="mb-2">Weibliche Bekleidung:</label>
+
+                        <drag-and-drop [currentUri]="selected?.data?.femaleClothingEvent" (selected)="fileBrowseHandler('femaleClothingEvent', $event)">
+
+                        </drag-and-drop>
+
+                        <mat-form-field class="mt-2 w-full">
+                          <mat-label>Beschreibung:</mat-label>
+                          <input matInput name="femaleClothingEventDescription" [(ngModel)]="selected.data.femaleClothingEventDescription" [ngModelOptions]="{standalone: true}"/>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+
+                  <mat-expansion-panel class="my-2 w-full">
+                    <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                      <mat-panel-title>
+                        Event Waffenordnung
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-auto flex-wrap">
+                      <div *ngFor="let equipment of selected.data.equipmentsEvent" class="flex flex-col w-full lg:w-1/4 lg:px-2 sm:px-4">
+                        <mat-form-field class="w-full">
+                          <mat-label>{{equipment.name}}:</mat-label>
+                          <input type="number" min="0" matInput name="amount" [(ngModel)]="equipment.amount" [ngModelOptions]="{standalone: true}" />
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+
+                  <mat-expansion-panel class="my-2 w-full">
+                    <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                      <mat-panel-title>
+                        Westen
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="flex flex-auto flex-wrap">
+                      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+                        <label class="mb-2">Normale Weste:</label>
+
+                        <drag-and-drop [currentUri]="selected?.data?.bodyArmor" (selected)="fileBrowseHandler('bodyArmor', $event)">
+
+                        </drag-and-drop>
+                      </div>
+
+                      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+                        <label class="mb-2">Event Weste:</label>
+
+                        <drag-and-drop [currentUri]="selected?.data?.bodyArmorEvent" (selected)="fileBrowseHandler('bodyArmorEvent', $event)">
+
+                        </drag-and-drop>
+                      </div>
+                    </div>
+                  </mat-expansion-panel>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between w-full border-t px-8 py-4">
+                <button class="-ml-4" mat-button [color]="'warn'" [disabled]="selected.default" (click)="delete()">
+                  {{selected.id === undefined ? 'Abbrechen' : 'Löschen'}}
+                </button>
+
+                <div class="flex items-center">
+                  <div class="flex items-center mr-4" *ngIf="flashMessage">
+                    <ng-container *ngIf="flashMessage === 'success'">
+                      <mat-icon class="text-green-500" [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                      <span class="ml-2">Der Rang wurde gespeichert!</span>
+                    </ng-container>
+                    <ng-container *ngIf="flashMessage === 'error'">
+                      <mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                      <span class="ml-2">Ein Fehler ist aufgetreten, versuche es erneut!</span>
+                    </ng-container>
+                  </div>
+                  <button mat-flat-button [color]="'primary'" (click)="patch()">
+                    {{selected.id === undefined ? 'Erstellen' : 'Speichern'}}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </ng-template>
+
+
+      <ng-template #noRecords>
+        <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+          Es wurden keine Ränge gefunden!
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

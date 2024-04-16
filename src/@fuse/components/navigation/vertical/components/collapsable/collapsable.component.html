@@ -1,0 +1,74 @@
+<div class="fuse-vertical-navigation-item-wrapper" [class.fuse-vertical-navigation-item-has-subtitle]="!!item.subtitle"
+  [ngClass]="item.classes?.wrapper">
+
+  <div class="fuse-vertical-navigation-item" [ngClass]="{'fuse-vertical-navigation-item-disabled': item.disabled}"
+    [matTooltip]="item.tooltip || ''" (click)="toggleCollapsable()">
+
+    <ng-container *ngIf="item.icon">
+      <mat-icon class="fuse-vertical-navigation-item-icon" [ngClass]="item.classes?.icon" [svgIcon]="item.icon">
+      </mat-icon>
+    </ng-container>
+
+    <div class="fuse-vertical-navigation-item-title-wrapper">
+      <div class="fuse-vertical-navigation-item-title">
+        <span [ngClass]="item.classes?.title">
+          {{item.title}}
+        </span>
+      </div>
+      <ng-container *ngIf="item.subtitle">
+        <div class="fuse-vertical-navigation-item-subtitle">
+          <span [ngClass]="item.classes?.subtitle">
+            {{item.subtitle}}
+          </span>
+        </div>
+      </ng-container>
+    </div>
+
+    <ng-container *ngIf="item.badge">
+      <div class="fuse-vertical-navigation-item-badge">
+        <div class="fuse-vertical-navigation-item-badge-content" [ngClass]="item.badge.classes">
+          {{item.badge.title}}
+        </div>
+      </div>
+    </ng-container>
+
+    <mat-icon class="fuse-vertical-navigation-item-arrow icon-size-4" [svgIcon]="'heroicons_solid:chevron-right'">
+
+    </mat-icon>
+  </div>
+</div>
+
+<div class="fuse-vertical-navigation-item-children" *ngIf="!isCollapsed" @expandCollapse>
+  <ng-container *ngFor="let item of item.children; trackBy: trackByFn">
+    <ng-container *ngIf="(item.hidden && !item.hidden(item)) || !item.hidden">
+
+      <ng-container *ngIf="item.type === 'basic' && canShow(item)">
+        <fuse-vertical-navigation-basic-item [item]="item" [name]="name"></fuse-vertical-navigation-basic-item>
+      </ng-container>
+
+      <!-- Collapsable -->
+      <ng-container *ngIf="item.type === 'collapsable' && canShow(item)">
+        <fuse-vertical-navigation-collapsable-item [item]="item" [name]="name" [autoCollapse]="autoCollapse">
+        </fuse-vertical-navigation-collapsable-item>
+      </ng-container>
+
+      <!-- Divider -->
+      <ng-container *ngIf="item.type === 'divider' && canShow(item)">
+        <fuse-vertical-navigation-divider-item [item]="item" [name]="name"></fuse-vertical-navigation-divider-item>
+      </ng-container>
+
+      <!-- Group -->
+      <ng-container *ngIf="item.type === 'group' && canShow(item)">
+        <fuse-vertical-navigation-group-item [item]="item" [name]="name"></fuse-vertical-navigation-group-item>
+      </ng-container>
+
+      <!-- Spacer -->
+      <ng-container *ngIf="item.type === 'spacer' && canShow(item)">
+        <fuse-vertical-navigation-spacer-item [item]="item" [name]="name"></fuse-vertical-navigation-spacer-item>
+      </ng-container>
+
+    </ng-container>
+
+  </ng-container>
+
+</div>

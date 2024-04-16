@@ -1,0 +1,141 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *ngIf="settings" @fadeIn>
+
+  <mat-drawer-container class="flex-auto h-full bg-card dark:bg-transparent">
+    <mat-drawer *ngIf="sidebarLabels.length !== 0" class="w-2/3 sm:w-72 lg:w-56 border-r-0 bg-default" [mode]="drawerMode" [opened]="drawerOpened" #drawer>
+      <div class="p-6 lg:py-8 lg:pl-4 lg:pr-0">
+        <div class="space-y-2">
+
+          <div class="relative flex items-center py-2 px-4 font-medium rounded-full cursor-pointer" [ngClass]="{'bg-gray-200 dark:bg-gray-700 text-primary dark:text-primary-400': filterStatus === 'ALL', 'text-hint hover:bg-hover': filterStatus !== 'ALL'}" (click)="resetFilter()" matRipple [matRippleDisabled]="filterStatus === 'ALL'">
+            <mat-icon class="text-current" [svgIcon]="'heroicons_outline:pencil-alt'"></mat-icon>
+            <div class="ml-3 leading-5 select-none text-default">Übersicht</div>
+          </div>
+          <ng-container *ngFor="let label of sidebarLabels">
+            <div class="relative flex items-center py-2 px-4 font-medium rounded-full cursor-pointer" [ngClass]="{'bg-gray-200 dark:bg-gray-700 text-primary dark:text-primary-400': label.value === filterStatus, 'text-hint hover:bg-hover': label.value !== filterStatus}" (click)="filterByLabel(label.value)" matRipple [matRippleDisabled]="label.value === filterStatus">
+              <mat-icon class="text-current" [svgIcon]="'heroicons_outline:tag'"></mat-icon>
+              <div class="ml-3 leading-5 select-none text-default">{{ label.title }}</div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </mat-drawer>
+
+    <mat-drawer-content class="flex flex-col bg-gray-100 dark:bg-transparent">
+      <div class="flex flex-col flex-auto p-6 md:p-8">
+        <div class="flex items-center" *ngIf="hasPermissions('CONTROL_CENTERS_MANAGE')">
+          <div class="flex items-center flex-auto">
+            <button class="flex lg:hidden -ml-2" mat-icon-button (click)="drawer.toggle()">
+              <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+            </button>
+
+            <div class="fuse-mat-rounded fuse-mat-dense fuse-mat-no-subscript flex-auto ml-4">
+              <search-member [type]="'ON_DUTY'" [appearance]="'basic'" (selected)="selectMember($event)">
+              </search-member>
+            </div>
+            <mat-form-field class="fuse-mat-no-subscript flex-auto ml-4">
+              <mat-select name="controlCenter" [(ngModel)]="selectedControlCenter" [placeholder]="'Wähle einen Bereich aus!'">
+                <mat-option [(value)]="item.id" *ngFor="let item of controlCenters">
+                  {{ item.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <button class="ml-4 px-1 sm:px-4 min-w-10" mat-flat-button [color]="'primary'" (click)="addUser()" [disabled]="selectedUser === undefined || selectedControlCenter === undefined || submitted">
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+            <span class="hidden sm:inline-block ml-2">Hinzufügen</span>
+          </button>
+        </div>
+
+        <fuse-masonry class="-mx-2 mt-8" [items]="getControlCenters()" [columns]="masonryColumns" [columnsTemplate]="columnsTemplate" *ngIf="hasPermissions('CONTROL_CENTERS_SHOW')">
+          <ng-template #columnsTemplate let-columns>
+            <ng-container *ngFor="let column of columns; trackBy: trackByFn">
+              <div class="flex-1 px-2 space-y-4">
+                <ng-container *ngFor="let item of column.items; trackBy: trackByFn">
+                  <div class="flex flex-col shadow rounded-2xl overflow-hidden cursor-pointer bg-card">
+                    <div class="flex flex-auto flex-col p-6 control-center">
+                      <button *ngIf="user?.status === 'ON_DUTY'" class="self-select" mat-icon-button [disabled]="submitted" (click)="addSelf(item.id)">
+                        <mat-icon [svgIcon]="'heroicons_outline:plus-circle'"></mat-icon>
+                      </button>
+
+                      <ng-container *ngIf="item.label">
+                        <div class="font-semibold line-clamp-3 mb-0 w-full">
+                          {{item.label}}
+                        </div>
+
+                        <div class="mt-0 line-clamp-2 text-secondary">
+                          Anzahl: {{getDetails(item.id)?.members.length ?? 0 }} / {{item.maxMembers === -1 ? 'Unbegrenzt' : item.maxMembers}}
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngIf="getDetails(item.id)?.members?.length > 0">
+                        <hr class="mt-2 mb-2">
+
+                        <div class="flex flex-col flex-auto overflow-x-auto">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th class="font-mono text-left">Name</th>
+                                <th class="font-mono text-left">Rufnummer</th>
+                                <th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let member of getDetails(item.id).members">
+                                <td class="font-mono text-md text-secondary" (click)="openMemberDialog(member)">
+                                  {{ member.firstName }} {{ member.lastName }}
+                                </td>
+                                <td class="font-mono text-md text-secondary" (click)="openMemberDialog(member)">
+                                  {{ member.phoneNumber }}
+                                </td>
+                                <td class="font-mono text-md text-secondary">
+                                  <a class="remove" (click)="removeUser(item.id, member.id)" *ngIf="hasPermissions('CONTROL_CENTERS_MANAGE')">
+                                    <mat-icon svgIcon="heroicons_outline:x"></mat-icon>
+                                  </a>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngIf="(item.hasStatus || item.hasVehicle) && (getDetails(item.id) && getDetails(item.id)?.members?.length !== 0)">
+                        <hr class="mt-2 mb-2">
+
+                        <div class="w-full flex flex-auto" *ngIf="item.hasVehicle && hasPermissions('CONTROL_CENTERS_MANAGE')">
+                          <search-vehicle class="w-full" (selected)="selectVehicle(item.id, $event)"></search-vehicle>
+                        </div>
+
+                        <div class="w-full flex flex-auto">
+                          <div class="flex flex-col w-1/2 mx-2" *ngIf="item.hasVehicle">
+                            <button class="h-6 min-h-6 px-2 w-full rounded-full bg-hover" mat-button (click)="removeVehicle(item.id)">
+                              <span class="font-medium text-sm text-secondary">
+                                {{getVehicle(item.id)}}
+                              </span>
+                            </button>
+                          </div>
+
+                          <div class="flex flex-col w-1/2 mx-2" *ngIf="item.hasStatus">
+                            <button class="h-6 min-h-6 px-2 w-full rounded-full bg-hover" [ngClass]="getStatusStyle(item.id)" mat-button [matMenuTriggerFor]="statusMenu">
+                              <span class="font-medium text-sm">
+                                {{getStatus(item.id)}}
+                              </span>
+                            </button>
+                            <mat-menu #statusMenu="matMenu">
+                              <button mat-menu-item *ngFor="let menu of settings.controlCenterStatus" (click)="updateStatus(item.id, menu.value)">
+                                {{menu.label}}
+                              </button>
+                            </mat-menu>
+                          </div>
+                        </div>
+
+                      </ng-container>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-template>
+        </fuse-masonry>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</div>

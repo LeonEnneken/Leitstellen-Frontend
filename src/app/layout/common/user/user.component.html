@@ -1,0 +1,64 @@
+<!-- Button -->
+<button mat-icon-button [matMenuTriggerFor]="userActions">
+  <span class="relative">
+    <img class="w-7 h-7 rounded-full" *ngIf="showAvatar && user?.account?.avatar" [src]="user?.account?.avatar">
+    <mat-icon *ngIf="!showAvatar || !user?.account?.avatar" [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+
+    <span class="absolute right-0 bottom-0 w-2 h-2 rounded-full" [ngClass]="getStatusStyle()">
+
+    </span>
+  </span>
+</button>
+
+<mat-menu [xPosition]="'before'" #userActions="matMenu">
+  <button mat-menu-item>
+    <span class="flex flex-col leading-none">
+      <span>Eingeloggt als</span>
+      <span class="mt-1.5 text-md font-medium">{{user.account.username}}#{{user.account.discriminator}}</span>
+    </span>
+  </button>
+  <mat-divider class="my-2"></mat-divider>
+
+  <button mat-menu-item [routerLink]="'/profile'">
+    <mat-icon [svgIcon]="'heroicons_outline:user'"></mat-icon>
+    <span>Dein Profil</span>
+  </button>
+
+  <button mat-menu-item [matMenuTriggerFor]="userStatus">
+    <mat-icon [svgIcon]="'heroicons_outline:dots-circle-horizontal'"></mat-icon>
+    <span>Status</span>
+  </button>
+  <mat-divider class="my-2"></mat-divider>
+  
+
+  <button *ngIf="hasPermission('SETTINGS_SHOW')" mat-menu-item [routerLink]="'/settings'">
+    <mat-icon [svgIcon]="'heroicons_outline:cog'"></mat-icon>
+    <span>Einstellungen</span>
+  </button>
+
+  <mat-divider *ngIf="hasPermission('SETTINGS_SHOW')" class="my-2"></mat-divider>
+
+  <a mat-menu-item [routerLink]="'/auth/sign-out'">
+    <mat-icon [svgIcon]="'heroicons_outline:logout'"></mat-icon>
+    <span>Ausloggen</span>
+  </a>
+</mat-menu>
+
+<mat-menu class="user-status-menu" #userStatus="matMenu">
+  <button mat-menu-item (click)="updateUserStatus('ON_DUTY')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-green-500"></span>
+    <span>Im Dienst</span>
+  </button>
+  <button mat-menu-item (click)="updateUserStatus('OFF_DUTY')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-amber-500"></span>
+    <span>Außer Dienst</span>
+  </button>
+  <button mat-menu-item (click)="updateUserStatus('AWAY_FROM_KEYBOARD')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-red-500"></span>
+    <span>AFK / AFK-Bot</span>
+  </button>
+  <button mat-menu-item (click)="updateUserStatus('OFFLINE')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-gray-400"></span>
+    <span>Offline</span>
+  </button>
+</mat-menu>

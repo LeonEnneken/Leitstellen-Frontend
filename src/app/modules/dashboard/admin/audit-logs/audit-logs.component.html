@@ -1,0 +1,294 @@
+<div class="flex flex-col flex-auto w-full sm:px-8">
+  <div class="flex flex-wrap w-full max-w-screen-xl mx-auto pt-8">
+    <div class="flex items-center justify-between w-full p-4 md:p-8 mb-0">
+      <div>
+        <div class="text-3xl font-semibold tracking-tight leading-8">
+          Audit-Logs Übersicht
+        </div>
+        <div class="font-medium tracking-tight text-secondary">
+          Hier gibt es alle Audit-Logs im Überblick!
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-4 md:p-8">
+      <div class="grid grid-cols-1 gap-8 w-full">
+
+        <div class="flex items-center">
+          <div class="flex items-center flex-auto">
+            <div class="fuse-mat-rounded fuse-mat-dense fuse-mat-no-subscript flex-auto mx-2">
+              <search-member [type]="'ALL'" [appearance]="'basic'" (selected)="selectMember($event)">
+              </search-member>
+            </div>
+
+            <mat-form-field class="fuse-mat-no-subscript flex-auto mx-2">
+              <mat-select name="type" [(ngModel)]="selectedType" [placeholder]="'Wähle einen Typen aus!'">
+                <mat-option [(value)]="type.value" *ngFor="let type of types">
+                  {{ type.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <button class="mx-2 px-2 sm:px-4 min-w-12" mat-flat-button [color]="'warn'" (click)="search()">
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+            <span class="hidden sm:inline-block ml-2">Reset</span>
+          </button>
+
+          <button class="mx-2 px-2 sm:px-4 min-w-12" mat-flat-button [color]="'primary'" (click)="search()" [disabled]="submitted">
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:search'"></mat-icon>
+            <span class="hidden sm:inline-block ml-2">Suchen</span>
+          </button>
+        </div>
+
+        <div class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+          <div class="flex flex-col p-6 pb-0">
+
+            <div class="flex items-start mt-2 max-w-full">
+              <mat-list class="overflow-y-scroll min-h-80 max-h-full w-full max-w-full divide-y">
+                <mat-list-item *ngFor="let item of auditLogs?.data">
+                  <div class="flex flex-col max-w-full w-full">
+                    <ng-container [ngSwitch]="item.type">
+
+                      <ng-container *ngSwitchCase="'MEMBER_HIRED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-green-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:login'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              {{item.description}}
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'MEMBER_TERMINATED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-red-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:logout'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              {{item.description}}
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'MEMBER_PROMOTED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-green-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:user-add'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              {{item.description}}
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'MEMBER_DEMOTED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-red-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:user-remove'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              {{item.description}}
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'MEMBER_DEPARTMENT_PATCHED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:document-add'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              {{item.description}}
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+
+
+
+
+                      <ng-container *ngSwitchCase="'CONTROL_CENTER_MEMBER_ADDED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-green-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:user-add'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              {{item.description}}
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'CONTROL_CENTER_MEMBER_REMOVED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-red-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:user-remove'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              {{item.description}}
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'CONTROL_CENTER_PATCHED_STATUS'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:tag'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              Leitstellen Status wurde geändert. (<b>Panel:</b> {{getChanges(item)[0].label}} | <b>Alt Wert:</b> {{getChanges(item)[0].status ? getChanges(item)[0].status : 'Nicht gesetzt'}} | <b>Neuer Wert:</b> {{getChanges(item)[1].status}})
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'CONTROL_CENTER_PATCHED_VEHICLE'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:key'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              Leitstellen Fahrzeug wurde geändert. (<b>Panel:</b> {{getChanges(item)[0].label}} | <b>Alt ID:</b> {{getChanges(item)[0].vehicle ? getChanges(item)[0].vehicle : 'Nicht gesetzt'}} | <b>Neuer ID:</b> {{getChanges(item)[1].vehicle}})
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'USER_PATCHED'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              Der Benutzer wurde geändert. 
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="'USER_PATCHED_OTHER'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              Der Status wurde geändert.
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                      <ng-container *ngSwitchCase="'USER_STATUS'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              Der Status wurde geändert. (<b>Von:</b> {{item.changes[0]}} | <b>Zu:</b> {{item.changes[1]}})
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="'USER_STATUS_OTHER'">
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-1">
+                              Der Status wurde geändert. (<b>Von:</b> {{item.changes[0]}} | <b>Zu:</b> {{item.changes[1]}})
+                            </div>
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+
+
+
+
+
+
+
+
+
+                      <ng-container *ngSwitchDefault>
+                        <div class="flex flex-row items-center w-full">
+                          <mat-icon class="text-amber-500 mr-4 hidden md:block" [svgIcon]="'heroicons_outline:archive'"></mat-icon>
+
+                          <div class="flex flex-col w-full">
+                            <div class="min-w-4 leading-5 mt-0.5">
+                              {{item.description}}
+                            </div>
+
+                            <ng-container *ngTemplateOutlet="auditLogDetails; context: { $implicit: item }"></ng-container>
+                          </div>
+                        </div>
+                      </ng-container>
+
+                    </ng-container>
+                  </div>
+                </mat-list-item>
+              </mat-list>
+            </div>
+
+            <mat-paginator class="border-b sm:border-b-0 bg-gray-50 dark:bg-transparent" [length]="auditLogs?.pagination?.count" [pageIndex]="auditLogs?.pagination?.page" [pageSize]="auditLogs?.pagination?.per_page" [pageSizeOptions]="[50, 100, 250, 500]" [showFirstLastButtons]="false" (page)="loadAuditLogs($event)"></mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<ng-template #auditLogDetails let-item>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-1 mb-1">
+    <div class="flex flex-col">
+      <span class="text-sm font-bold text-secondary" *ngIf="item.sender">
+        Ausgeführt von:
+      </span>
+
+      <span class="text-sm font-medium text-secondary" *ngIf="item.sender && item.sender.id != 0">
+        {{ item.sender.firstName }} {{ item.sender.lastName }} (ID: {{ item.sender.id }})
+      </span>
+      <span class="text-sm font-medium text-secondary" *ngIf="item.sender && item.sender.id == 0">
+        {{ item.sender.firstName }} {{ item.sender.lastName }}
+      </span>
+    </div>
+    <div class="flex flex-col">
+      <span class="text-sm font-bold text-secondary" *ngIf="item.target">
+        Das Ziel:
+      </span>
+      <span class="text-sm font-medium text-secondary" *ngIf="item.target">
+        {{ item.target.firstName }} {{ item.target.lastName }} (ID: {{ item.target.id }})
+      </span>
+    </div>
+    <div class="flex flex-col">
+      <span class="text-sm font-bold text-secondary" *ngIf="item.createdAt">
+        Datum:
+      </span>
+      <span class="text-sm font-medium text-secondary" *ngIf="item.createdAt">
+        {{ item.createdAt | date: 'dd.MM.yyyy HH:mm'}} Uhr
+      </span>
+    </div>
+  </div>
+</ng-template>

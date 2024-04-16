@@ -1,0 +1,415 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent" *ngIf="settings && members && terminatedMembers" @fadeIn>
+  <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+
+    <div class="text-4xl font-extrabold tracking-tight">
+      Mitarbeiter Liste <small>(Anzahl: {{ members.length }})</small>
+    </div>
+
+    <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+      <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded min-w-64 mr-4">
+        <mat-select name="statusFilter" [(ngModel)]="statusFilter">
+          <mat-option value="ALL">
+            Alle anzeigen
+          </mat-option>
+          <mat-option value="ON_DUTY">
+            Im Dienst
+          </mat-option>
+          <mat-option value="OFF_DUTY">
+            Außer Dienst
+          </mat-option>
+          <mat-option value="AWAY_FROM_KEYBOARD">
+            AFK / AFK-Bot
+          </mat-option>
+          <mat-option value="OFFLINE">
+            Offline
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded min-w-64">
+        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:search'"></mat-icon>
+        <input matInput [formControl]="searchInputControl" [autocomplete]="'off'" [placeholder]="'Mitarbeiter suchen..'">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="flex flex-auto overflow-hidden">
+    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+      <ng-container *ngIf="members?.length > 0; else noMembers">
+        <div class="grid">
+          <div class="hr-management-members-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5" matSort matSortDisableClear>
+            <div [mat-sort-header]="'id'">ID</div>
+            <div [mat-sort-header]="'fullName'">Name</div>
+            <div [mat-sort-header]="'group'">Rang</div>
+            <div>Telefon Nummer</div>
+            <div [mat-sort-header]="'status'">Status</div>
+          </div>
+
+          <ng-container *ngFor="let member of members; trackBy: trackByFn">
+            <div class="hr-management-members-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b" *ngIf="checkSearch(member) && member.user.id" (click)="toggleEdit(member.id)">
+              <div class="truncate">
+                {{member.user.id}}
+              </div>
+
+              <div class="truncate">
+                {{member.user.firstName}} {{member.user.lastName}}
+              </div>
+
+              <div class="truncate">
+                {{getGroup(member.groupId)?.uniqueId}}. {{getGroup(member.groupId)?.name}}
+              </div>
+
+              <div class="truncate">
+                {{member.user.phoneNumber}}
+              </div>
+
+              <div class="truncate flex justify-left">
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'ON_DUTY'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-green-500"></div>
+                  <span>Im Dienst</span>
+                </div>
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'OFF_DUTY'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-amber-500"></div>
+                  <span>Außer Dienst</span>
+                </div>
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'AWAY_FROM_KEYBOARD'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-red-500"></div>
+                  <span>AFK / AFK-Bot</span>
+                </div>
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'OFFLINE'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-gray-400"></div>
+                  <span>Offline</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid">
+              <ng-container *ngIf="selected?.id === member.id">
+                <ng-container *ngTemplateOutlet="memberTemplate; context: {$implicit: member}">
+
+                </ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+
+    <div class="text-4xl font-extrabold tracking-tight">
+      Gekündigte Mitarbeiter <small>(Anzahl: {{ terminatedMembers.length }})</small>
+    </div>
+
+    <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+      <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded min-w-64">
+        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:search'"></mat-icon>
+        <input matInput [formControl]="searchInputControl" [autocomplete]="'off'" [placeholder]="'Mitarbeiter suchen..'">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="flex flex-auto overflow-hidden">
+    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+      <ng-container *ngIf="terminatedMembers?.length > 0; else noMembers">
+        <div class="grid">
+          <div class="hr-management-members-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5" matSort matSortDisableClear>
+            <div [mat-sort-header]="'id'">ID</div>
+            <div [mat-sort-header]="'fullName'">Name</div>
+            <div [mat-sort-header]="'group'">Rang</div>
+            <div>Telefon Nummer</div>
+            <div [mat-sort-header]="'status'">Status</div>
+          </div>
+
+          <ng-container *ngFor="let member of terminatedMembers; trackBy: trackByFn">
+            <div class="hr-management-members-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b" *ngIf="checkSearch(member) && member.user.id" (click)="toggleEdit(member.id)">
+              <div class="truncate">
+                {{member.user.id}}
+              </div>
+
+              <div class="truncate">
+                {{member.user.firstName}} {{member.user.lastName}}
+              </div>
+
+              <div class="truncate">
+                {{getGroup(member.groupId)?.uniqueId}}. {{getGroup(member.groupId)?.name}}
+              </div>
+
+              <div class="truncate">
+                {{member.user.phoneNumber}}
+              </div>
+
+              <div class="truncate flex justify-left">
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'ON_DUTY'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-green-500"></div>
+                  <span>Im Dienst</span>
+                </div>
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'OFF_DUTY'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-amber-500"></div>
+                  <span>Außer Dienst</span>
+                </div>
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'AWAY_FROM_KEYBOARD'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-red-500"></div>
+                  <span>AFK / AFK-Bot</span>
+                </div>
+                <div class="flex flex-row items-center" *ngIf="member?.user?.status === 'OFFLINE'">
+                  <div class="w-4 h-4 mr-3 rounded-full bg-gray-400"></div>
+                  <span>Offline</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid">
+              <ng-container *ngIf="selected?.id === member.id">
+                <ng-container *ngTemplateOutlet="memberTemplate; context: {$implicit: member}">
+
+                </ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+
+<ng-template #memberTemplate let-member>
+  <div class="shadow-lg overflow-hidden">
+    <div class="flex border-b">
+
+      <form class="flex flex-col w-full" [formGroup]="selectedForm">
+        <div class="flex flex-col sm:flex-row p-8">
+          <div class="flex flex-auto flex-wrap">
+            <div class="flex flex-col w-full lg:w-1/5 sm:px-2" [formGroupName]="'user'">
+              <mat-form-field class="w-full">
+                <mat-label>Status:</mat-label>
+                <mat-select [formControlName]="'status'">
+                  <mat-option value="ON_DUTY">
+                    Im Dienst
+                  </mat-option>
+                  <mat-option value="OFF_DUTY">
+                    Außer Dienst
+                  </mat-option>
+                  <mat-option value="AWAY_FROM_KEYBOARD">
+                    AFK / AFK-Bot
+                  </mat-option>
+                  <mat-option value="OFFLINE">
+                    Offline
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full lg:w-1/5 sm:px-2" [formGroupName]="'user'">
+              <mat-form-field class="w-full">
+                <mat-label>ID:</mat-label>
+                <input matInput [formControlName]="'id'" />
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full lg:w-1/5 sm:px-2" [formGroupName]="'user'">
+              <mat-form-field class="w-full">
+                <mat-label>Vorname:</mat-label>
+                <input matInput [formControlName]="'firstName'" />
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full lg:w-1/5 sm:px-2" [formGroupName]="'user'">
+              <mat-form-field class="w-full">
+                <mat-label>Nachname:</mat-label>
+                <input matInput [formControlName]="'lastName'" />
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full lg:w-1/5 sm:px-2" [formGroupName]="'user'">
+              <mat-form-field class="w-full">
+                <mat-label>Telefon Nummer:</mat-label>
+                <input matInput [formControlName]="'phoneNumber'" />
+              </mat-form-field>
+            </div>
+
+            <div class="flex flex-col w-full">
+              <mat-divider class="mt-5 mb-5"></mat-divider>
+            </div>
+
+            <div class="flex flex-col w-full lg:w-1/3 sm:px-2" *ngIf="settings.options?.hasDutyNumber">
+              <mat-form-field class="w-full">
+                <mat-label>Dienstnummer:</mat-label>
+                <input matInput [formControlName]="'dutyNumber'" />
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full sm:px-2" [ngClass]="{ 'lg:w-1/3': settings.options?.hasDutyNumber, 'lg:w-1/2': !(settings.options?.hasDutyNumber)}">
+              <mat-form-field class="w-full">
+                <mat-label>Rang:</mat-label>
+                <mat-select [formControlName]="'groupId'">
+                  <mat-option *ngFor="let group of groups" [value]="group.id" [disabled]="hasGroup(group)">
+                    {{group.uniqueId}}. {{group.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full sm:px-2" [ngClass]="{ 'lg:w-1/3': settings.options?.hasDutyNumber, 'lg:w-1/2': !(settings.options?.hasDutyNumber)}">
+              <mat-form-field class="w-full">
+                <mat-label>Abteilung:</mat-label>
+                <mat-select [formControlName]="'departmentIds'" multiple>
+                  <mat-option *ngFor="let department of departments" [value]="department.id">
+                    {{department.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+
+            <div class="flex flex-col w-full lg:w-1/3 sm:px-2">
+              <mat-form-field class="w-full">
+                <mat-label>Einstellungsdatum:</mat-label>
+                <input matInput [matDatepicker]="hiredDate" [formControlName]="'hiredDate'">
+                <mat-datepicker-toggle matSuffix [for]="hiredDate">
+
+                </mat-datepicker-toggle>
+                <mat-datepicker #hiredDate></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full lg:w-1/3 sm:px-2">
+              <mat-form-field class="w-full">
+                <mat-label>Letzte Beförderung:</mat-label>
+                <input matInput [matDatepicker]="lastPromotionDate" [formControlName]="'lastPromotionDate'">
+                <mat-datepicker-toggle matSuffix [for]="lastPromotionDate">
+
+                </mat-datepicker-toggle>
+                <mat-datepicker #lastPromotionDate></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="flex flex-col w-full lg:w-1/3 sm:px-2">
+              <mat-form-field class="w-full">
+                <mat-label>Letzte Kündigung:</mat-label>
+                <input matInput [disabled]="true" name="terminatedAt" [value]="selected.terminatedAt ? (selected.terminatedAt | date: 'dd.MM.yyyy \'um\' HH:mm \'Uhr\'') : 'Nicht vorhanden..'">
+              </mat-form-field>
+            </div>
+
+            <div class="flex flex-col w-full sm:px-2">
+              <mat-form-field class="w-full">
+                <mat-label>Notizen:</mat-label>
+                <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="4" [formControlName]="'notes'"></textarea>
+              </mat-form-field>
+            </div>
+
+
+            <div *ngIf="fieldOfStudy && fieldOfStudy.length !== 0" class="flex flex-col w-full">
+              <mat-divider class="mt-5 mb-5"></mat-divider>
+            </div>
+
+            <div *ngIf="fieldOfStudy && fieldOfStudy.length !== 0" class="flex items-center justify-between w-full px-4 py-2">
+              <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">
+                Fachrichtungen:
+              </div>
+            </div>
+
+            <div *ngFor="let item of fieldOfStudy" class="flex items-center justify-between w-full lg:w-1/4 px-4 py-2">
+              <ng-container *ngIf="item.type === 'BOOLEAN'" [formGroup]="selectedFieldOfStudyForm">
+                <div *ngIf="!(item.description)" class="flex-auto leading-6 cursor-pointer" (click)="fieldOfStudyItem.toggle()">
+                  {{item.label}}
+                </div>
+
+                <div *ngIf="item.description" class="flex-auto cursor-pointer" (click)="fieldOfStudyItem.toggle()">
+                  <div class="leading-6 font-medium">
+                    {{item.label}}
+                  </div>
+                  <div class="text-md text-secondary">
+                    {{item.description}}
+                  </div>
+                </div>
+
+                <mat-slide-toggle class="ml-2" [color]="'primary'" [formControlName]="item.key" #fieldOfStudyItem>
+
+                </mat-slide-toggle>
+              </ng-container>
+
+              <ng-container *ngIf="item.type === 'NUMBER'" [formGroup]="selectedFieldOfStudyForm">
+                <mat-form-field class="w-full">
+                  <mat-label>{{item.label}}:</mat-label>
+                  <input matInput type="number" min="1" max="6" [formControlName]="item.key" />
+                </mat-form-field>
+              </ng-container>
+            </div>
+
+
+            <div *ngIf="trainings && trainings.length !== 0" class="flex flex-col w-full">
+              <mat-divider class="mt-5 mb-5"></mat-divider>
+            </div>
+
+            <div *ngIf="trainings && trainings.length !== 0" class="flex items-center justify-between w-full px-4 py-2">
+              <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">
+                Ausbildungen:
+              </div>
+            </div>
+
+            <div *ngFor="let item of trainings" class="flex items-center justify-between w-full lg:w-1/2 px-4 py-2">
+              <ng-container *ngIf="item.type === 'BOOLEAN'" [formGroup]="selectedTrainingsForm">
+                <div *ngIf="!(item.description)" class="flex-auto leading-6 cursor-pointer" (click)="trainingsItem.toggle()">
+                  {{item.label}}
+                </div>
+
+                <div *ngIf="item.description" class="flex-auto cursor-pointer" (click)="trainingsItem.toggle()">
+                  <div class="leading-6 font-medium">
+                    {{item.label}}
+                  </div>
+                  <div class="text-md text-secondary">
+                    {{item.description}}
+                  </div>
+                </div>
+
+                <mat-slide-toggle class="ml-2" [color]="'primary'" [formControlName]="item.key" #trainingsItem>
+
+                </mat-slide-toggle>
+              </ng-container>
+
+              <ng-container *ngIf="item.type === 'NUMBER'" [formGroup]="selectedTrainingsForm">
+                <mat-form-field class="w-full">
+                  <mat-label>{{item.label}}:</mat-label>
+                  <input matInput type="number" min="1" max="6" [formControlName]="item.key" />
+                </mat-form-field>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between w-full border-t px-8 py-4">
+          <div class="flex items-center">
+
+            <button mat-flat-button [disabled]="submitted" [color]="'primary'" (click)="updateSelected()">
+              Speichern
+            </button>
+
+            <div class="flex items-center ml-4" *ngIf="flashMessage">
+              <ng-container *ngIf="flashMessage === 'success'">
+                <mat-icon class="text-green-500" [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                <span class="ml-2">Der Mitarbeiter wurde gespeichert!</span>
+              </ng-container>
+              <ng-container *ngIf="flashMessage === 'error'">
+                <mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                <span class="ml-2">Ein Fehler ist aufgetreten, versuche es erneut!</span>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <button *ngIf="!(selected.terminated)" mat-flat-button [disabled]="submitted" [color]="'warn'" (click)="terminateMember()">
+              Kündigen
+            </button>
+
+            <button *ngIf="selected.terminated" mat-flat-button [disabled]="submitted" [color]="'success'" (click)="hireMember()">
+              Wieder einstellen
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #noMembers>
+  <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+    Es wurden keine Mitarbeiter gefunden!
+  </div>
+</ng-template>

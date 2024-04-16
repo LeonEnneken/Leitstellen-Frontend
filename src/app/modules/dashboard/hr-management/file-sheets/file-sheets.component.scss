@@ -1,0 +1,31 @@
+.file-sheets-grid {
+  grid-template-columns: 120px auto;
+
+  @screen sm {
+    grid-template-columns: 120px auto;
+  }
+
+  @screen md {
+    grid-template-columns: 140px auto 40px 140px 180px 80px;
+  }
+
+  @screen lg {
+    grid-template-columns: 140px auto 40px 140px 180px 80px;
+  }
+
+  .title, .truncate {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+  }
+}
+
+.file-input {
+  display: none;
+}
+
+.shadow-file {
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+}

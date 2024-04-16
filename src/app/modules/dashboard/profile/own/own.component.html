@@ -1,0 +1,168 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex flex-col shadow bg-card">
+    <div class="blur">
+      <img class="h-20 lg:h-40 object-cover" src="https://images.es-intern.de/sOJQhdjP.jpg" />
+    </div>
+
+    <div class="flex flex-col flex-0 lg:flex-row items-center max-w-7xl w-full mx-auto px-8 lg:h-18 bg-card">
+      <div class="-mt-26 lg:-mt-22 rounded-full">
+        <img class="w-32 h-32 rounded-full ring-4 ring-bg-card" [src]="user?.account?.avatar" [alt]="user?.account?.username" />
+      </div>
+
+      <div class="flex flex-col items-center lg:items-start mt-4 lg:mt-0 lg:ml-8">
+        <div class="text-lg font-bold leading-none">
+          {{user?.details?.firstName}} {{user?.details?.lastName}} (ID: {{user?.details?.id}})
+        </div>
+        <div class="text-secondary">
+          {{user?.group?.uniqueId}}. {{user?.group?.name}}
+        </div>
+      </div>
+
+      <div class="hidden lg:flex h-8 mx-8 border-l-2"></div>
+
+      <div class="flex items-center mt-6 lg:mt-0 space-x-6">
+        <div class="flex flex-col items-center" *ngIf="user?.hiredDate">
+          <span class="font-bold">
+            {{user?.hiredDate | date: 'dd.MM.yyyy'}}
+          </span>
+          <span class="text-sm font-medium text-secondary">
+            Eingestellt am
+          </span>
+        </div>
+        <div class="flex flex-col items-center" *ngIf="user?.lastPromotionDate">
+          <span class="font-bold">
+            {{user?.lastPromotionDate | date: 'dd.MM.yyyy'}}
+          </span>
+          <span class="text-sm font-medium text-secondary">
+            Letzte Beförderung
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-auto justify-center w-full max-w-5xl mx-auto p-6 sm:p-8">
+    <div class="hidden lg:flex flex-col items-start mr-8">
+
+      <!-- About me -->
+      <fuse-card class="flex flex-col max-w-120 w-full p-8">
+        <div class="text-2xl font-semibold leading-tight">
+          Über Mich
+        </div>
+        <div class="mt-4">
+          Hier findest du alle Grund Informationen über Dich selbst!
+        </div>
+        
+        <hr class="w-full border-t my-6">
+        
+        <div class="flex flex-col">
+          <div class="flex items-center">
+            <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_outline:identification'" matTooltip="Reisepass-Nummer" matTooltipPosition="left"></mat-icon>
+            <span class="leading-none">{{user?.details?.id}}</span>
+          </div>
+          <div class="flex items-center mt-4">
+            <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_outline:user'" matTooltip="Name" matTooltipPosition="left"></mat-icon>
+            <span class="leading-none">{{user?.details?.firstName}} {{user?.details?.lastName}}</span>
+          </div>
+          <div class="flex items-center mt-4">
+            <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_outline:phone'" matTooltip="Rufnummer" matTooltipPosition="left"></mat-icon>
+            <span class="leading-none">{{user?.details?.phoneNumber}}</span>
+          </div>
+          <div class="flex items-center mt-4">
+            <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_outline:calendar'" matTooltip="Einstellungs-Datum" matTooltipPosition="left"></mat-icon>
+            <span class="leading-none">{{user?.hiredDate | date: 'dd.MM.yyyy'}}</span>
+          </div>
+          <div class="flex items-center mt-4">
+            <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_outline:briefcase'" matTooltip="Rang" matTooltipPosition="left"></mat-icon>
+            <span class="leading-none">{{user?.group?.uniqueId}}. {{user?.group?.name}}</span>
+          </div>
+          <div class="flex items-center mt-4" *ngIf="settings?.options?.hasDutyNumber && user.dutyNumber">
+            <mat-icon class="icon-size-5 mr-3" [svgIcon]="'heroicons_outline:finger-print'" matTooltip="Dienstnummer" matTooltipPosition="left"></mat-icon>
+            <span class="leading-none">{{user.dutyNumber}}</span>
+          </div>
+        </div>
+      </fuse-card>
+    </div>
+
+    <!-- Column -->
+    <div class="flex flex-col w-full gap-8">
+      <fuse-card class="flex flex-col w-full p-6 sm:p-8 pb-6" *ngIf="settings.trainings && settings.trainings.length !== 0">
+        <div class="text-xl font-semibold">
+          Ausbildungen / Schulungen
+        </div>
+        <div class="flex flex-col sm:flex-row items-start mt-4">
+          <div class="flex flex-col flex-auto overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th class="font-mono text-left">Name</th>
+                  <th class="font-mono text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of settings.trainings">
+                  <td class="font-mono text-md text-secondary items-center text-left text-ellipsis">
+                    {{item.label}}
+                  </td>
+
+                  <td class="font-mono text-md text-secondary text-center">
+                    <span *ngIf="getTraining(item)" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50">
+                      <span class="leading-relaxed whitespace-nowrap">
+                        Bestanden
+                      </span>
+                    </span>
+                    <span *ngIf="!(getTraining(item))" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50">
+                      <span class="leading-relaxed whitespace-nowrap">
+                        Nicht absolviert
+                      </span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </fuse-card>
+
+
+      <fuse-card class="flex flex-col w-full p-6 sm:p-8 pb-6" *ngIf="settings.fieldOfStudy && settings.fieldOfStudy.length !== 0">
+        <div class="text-xl font-semibold">
+          Fachrichtungen
+        </div>
+        <div class="flex flex-col sm:flex-row items-start mt-4">
+          <div class="flex flex-col flex-auto overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th class="font-mono text-left">Name</th>
+                  <th class="font-mono text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of settings.fieldOfStudy">
+                  <td class="font-mono text-md text-secondary items-center text-left text-ellipsis">
+                    {{item.label}}
+                  </td>
+
+                  <td class="font-mono text-md text-secondary text-center">
+                    <span *ngIf="getFieldOfStudy(item)" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50">
+                      <span class="leading-relaxed whitespace-nowrap">
+                        Bestanden
+                      </span>
+                    </span>
+                    <span *ngIf="!(getFieldOfStudy(item))" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50">
+                      <span class="leading-relaxed whitespace-nowrap">
+                        Nicht absolviert
+                      </span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </fuse-card>
+
+    </div>
+  </div>
+</div>

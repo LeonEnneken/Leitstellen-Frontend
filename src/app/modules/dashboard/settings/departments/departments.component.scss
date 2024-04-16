@@ -1,0 +1,16 @@
+.departments-grid {
+  grid-template-columns: auto 80px;
+
+  @screen sm {
+    grid-template-columns: auto 80px;
+  }
+
+  @screen md {
+    grid-template-columns: auto 120px;
+  }
+
+  @screen lg {
+    grid-template-columns: auto 120px;
+  }
+
+}

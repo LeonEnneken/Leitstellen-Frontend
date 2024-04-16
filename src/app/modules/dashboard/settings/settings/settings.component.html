@@ -1,0 +1,90 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+
+  <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 border-b">
+    <div class="ml-2 lg:ml-0 tracking-tight leading-none">
+      <div class="mr-4 text-2xl text-lg font-medium tracking-tight leading-6 truncate">
+        Generelle Einstellungen
+      </div>
+      <div class="mt-2 text-1xl text-secondary font-medium">
+        Hier sind alle generellen Einstellungen zu finden
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-auto overflow-hidden">
+    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+      <form [formGroup]="form">
+        <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+          <div class="col-span-4 md:col-span-2">
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+              <mat-label>Organisations-Name:</mat-label>
+              <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:office-building'" matPrefix></mat-icon>
+              <input [formControlName]="'organisationName'" matInput>
+            </mat-form-field>
+          </div>
+          <div class="col-span-4 md:col-span-2">
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+              <mat-label>Logo Link:</mat-label>
+              <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:camera'" matPrefix></mat-icon>
+              <input [formControlName]="'logoUrl'" matInput>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-span-4 md:col-span-2">
+            <mat-form-field class="fuse-mat-no-subscript w-full" [formGroupName]="'loginPage'">
+              <mat-label>Login Seite - Kopfzeile:</mat-label>
+              <input [formControlName]="'title'" matInput>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-span-4 md:col-span-2">
+            <mat-form-field class="fuse-mat-no-subscript w-full" [formGroupName]="'loginPage'">
+              <mat-label>Login Seite - Beschreibung:</mat-label>
+              <input [formControlName]="'description'" matInput>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="my-10 border-t"></div>
+
+        <div class="w-full text-xl">
+          Optionen
+        </div>
+        <div class="text-1xl text-secondary font-medium">
+          Optionale Features können hier verwaltet werden. 
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 w-full mt-8">
+          <div class="flex items-center justify-between">
+            <div class="flex-auto cursor-pointer" (click)="hasDutyNumber.toggle()">
+              <div class="leading-6 font-medium">Dienstnummer</div>
+              <div class="text-md text-secondary">Gibt es Mitarbeiter Dienstnummern?</div>
+            </div>
+            <mat-slide-toggle class="ml-2" [color]="'primary'" [formControlName]="'hasDutyNumber'" #hasDutyNumber>
+
+            </mat-slide-toggle>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between w-full border-b px-4 py-8">
+          <button mat-flat-button [color]="'primary'" (click)="saveSettings()">
+            Speichern
+          </button>
+
+          <div class="flex items-center">
+            <div class="flex items-center mr-4" *ngIf="flashMessage">
+              <ng-container *ngIf="flashMessage === 'success'">
+                <mat-icon class="text-green-500" [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                <span class="ml-2">Die Einstellungen wurden gespeichert!</span>
+              </ng-container>
+              <ng-container *ngIf="flashMessage === 'error'">
+                <mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                <span class="ml-2">Ein Fehler ist aufgetreten, versuche es erneut!</span>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

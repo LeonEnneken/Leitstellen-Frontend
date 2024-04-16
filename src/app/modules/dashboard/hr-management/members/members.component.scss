@@ -1,0 +1,19 @@
+.hr-management-members-grid {
+  grid-template-columns: 60px 180px auto 300px 120px;
+
+  @screen sm {
+    grid-template-columns: 60px 180px auto 300px 120px;
+  }
+
+  @screen md {
+    grid-template-columns: 80px 200px auto 300px 120px;
+  }
+
+  @screen lg {
+    grid-template-columns: 80px 200px auto 300px 160px;
+  }
+}
+
+.truncate-center {
+  text-align: center;
+}

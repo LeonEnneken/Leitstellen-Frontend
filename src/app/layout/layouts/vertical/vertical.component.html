@@ -1,0 +1,160 @@
+<fuse-vertical-navigation class="dark bg-indigo-800 text-white print:hidden" [mode]="isScreenSmall ? 'over' : 'side'"
+  [name]="'mainNavigation'" [navigation]="items" [opened]="!isScreenSmall">
+
+  <ng-container fuseVerticalNavigationHeader>
+    <div class="flex items-center h-20 p-6 pb-0">
+      <img class="w-60" [src]="settings?.logoUrl">
+    </div>
+  </ng-container>
+
+  <ng-container fuseVerticalNavigationFooter>
+    <div class="flex items-center w-full px-6 py-8 border-t">
+      <user></user>
+      <div class="flex flex-col w-full ml-4 overflow-hidden">
+        <div *ngIf="user.details" class="w-full whitespace-nowrap overflow-ellipsis overflow-hidden leading-normal text-current opacity-80">
+          {{user?.details?.firstName}} {{user?.details?.lastName}} (ID: {{user?.details?.id}})
+        </div>
+        <div *ngIf="!user.details" class="w-full whitespace-nowrap overflow-ellipsis overflow-hidden leading-normal text-current opacity-80">
+          {{user?.account?.username}}#{{user?.account?.discriminator}}
+        </div>
+        <div class="w-full mt-0.5 whitespace-nowrap text-sm overflow-ellipsis overflow-hidden leading-normal text-current opacity-50">
+          {{ user?.group ? user?.group?.name : user.role }}
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</fuse-vertical-navigation>
+
+<div class="flex flex-col flex-auto w-full min-w-0">
+
+  <div class="relative flex flex-0 items-center w-full h-16 px-4 md:px-6 z-49 shadow dark:shadow-none dark:border-b bg-card dark:bg-transparent print:hidden">
+
+    <button class="mr-2" mat-icon-button (click)="toggleNavigation('mainNavigation')">
+      <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+    </button>
+
+    <div class="flex items-center sm:ml-2 space-x-2">
+      <a mat-flat-button [color]="'success'" target="_blank" href="https://donations.grand-roleplay.de">
+        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:gift'"></mat-icon>
+        <div class="ml-2 flex flex-col">          
+          <span class="text-base">Spenden für die Leitstelle!</span>
+          <span class="text-base">Stand: {{getCurrentAmount()}} € von {{getMaxAmount()}} €</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="flex flex-col pl-2 ml-auto space-y-1.5 hidden md:block">
+      <div class="flex justify-center items-center space-x-1 sm:space-x-2">
+
+        <span *ngFor="let item of settings?.headerDetailsTop" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase" [ngClass]="getHeaderClasses(item)">
+          <span class="leading-relaxed whitespace-nowrap">
+            {{item.label}}: {{getCount(item)}}
+          </span>
+        </span>
+
+        <span class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50">
+          <span class="leading-relaxed whitespace-nowrap">
+            Im Dienst: {{ counts?.members?.onDuty ?? 0 }}
+          </span>
+        </span>
+
+        <span class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50">
+          <span class="leading-relaxed whitespace-nowrap">
+            Außer Dienst: {{ counts?.members?.offDuty ?? 0 }}
+          </span>
+        </span>
+
+        <span class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50">
+          <span class="leading-relaxed whitespace-nowrap">
+            AFK / AFK-Bot: {{ counts?.members?.awayFromKeyboard ?? 0 }}
+          </span>
+        </span>
+
+        <span class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase bg-blue-200 text-blue-800 dark:bg-blue-600 dark:text-blue-50">
+          <span class="leading-relaxed whitespace-nowrap">
+            Gesamt: {{ counts?.members?.onDuty + counts?.members?.offDuty + counts?.members?.offline }}
+          </span>
+        </span>
+      </div>
+
+      <div class="flex justify-center items-center space-x-1 sm:space-x-2">
+        <span *ngFor="let item of settings?.headerDetailsBottom" class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase" [ngClass]="getHeaderClasses(item)">
+          <span class="leading-relaxed whitespace-nowrap">
+            {{item.label}}: {{getCount(item)}}
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="flex items-center pl-2 ml-auto space-x-0.5 sm:space-x-2">
+
+      <button mat-menu-item [matMenuTriggerFor]="userStatus">
+        <div class="flex flex-row items-center" *ngIf="user?.status === 'ON_DUTY'">
+          <div class="w-4 h-4 mr-3 rounded-full bg-green-500"></div>
+          <span>Im Dienst</span>
+        </div>
+        <div class="flex flex-row items-center" *ngIf="user?.status === 'OFF_DUTY'">
+          <div class="w-4 h-4 mr-3 rounded-full bg-amber-500"></div>
+          <span>Außer Dienst</span>
+        </div>
+        <div class="flex flex-row items-center" *ngIf="user?.status === 'AWAY_FROM_KEYBOARD'">
+          <div class="w-4 h-4 mr-3 rounded-full bg-red-500"></div>
+          <span>AFK / AFK-Bot</span>
+        </div>
+        <div class="flex flex-row items-center" *ngIf="user?.status === 'OFFLINE'">
+          <div class="w-4 h-4 mr-3 rounded-full bg-gray-400"></div>
+          <span>Offline</span>
+        </div>
+      </button>
+
+      <div class="spacer hidden md:block"></div>
+
+      <radio-codes class="hidden md:block"></radio-codes>
+      <fuse-fullscreen class="hidden md:block"></fuse-fullscreen>
+      <!--<search [appearance]="'bar'"></search>-->
+    </div>
+  </div>
+
+  <div class="flex flex-col flex-auto">
+    <router-outlet *ngIf="true"></router-outlet>
+  </div>
+
+  <div *ngIf="isScreenSmall" class="block w-full px-4 md:px-6 z-49 border-t bg-card dark:bg-transparent print:hidden">
+    <div class="flex flex-col items-center justify-center w-full my-2">
+      <span class="font-medium text-secondary">
+        Enneken-Solutions.de &copy; {{currentYear}}
+      </span>
+      <span class="font-medium text-secondary">
+        Made by Leon Shorty (ID: 4754)
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="!(isScreenSmall)" class="relative flex flex-0 items-center justify-between w-full h-14 px-4 md:px-6 z-49 border-t bg-card dark:bg-transparent print:hidden">
+    <span class="font-medium text-secondary">
+      Enneken-Solutions.de &copy; {{currentYear}} :: Made by Leon Shorty (ID: 4754)
+    </span>
+  </div>
+
+</div>
+
+
+
+<mat-menu class="user-status-menu" #userStatus="matMenu">
+  <button mat-menu-item (click)="updateUserStatus('ON_DUTY')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-green-500"></span>
+    <span>Im Dienst</span>
+  </button>
+  <button mat-menu-item (click)="updateUserStatus('OFF_DUTY')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-amber-500"></span>
+    <span>Außer Dienst</span>
+  </button>
+  <button mat-menu-item (click)="updateUserStatus('AWAY_FROM_KEYBOARD')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-red-500"></span>
+    <span>AFK / AFK-Bot</span>
+  </button>
+  <button mat-menu-item (click)="updateUserStatus('OFFLINE')">
+    <span class="w-4 h-4 mr-3 rounded-full bg-gray-400"></span>
+    <span>Offline</span>
+  </button>
+</mat-menu>

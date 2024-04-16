@@ -1,0 +1,19 @@
+.file-sheets-strikes-grid {
+  grid-template-columns: 80px 200px auto 40px;
+
+  @screen sm {
+    grid-template-columns: 80px 200px auto 40px;
+  }
+
+  @screen md {
+    grid-template-columns: 80px 200px auto 40px;
+  }
+
+  @screen lg {
+    grid-template-columns: 80px 200px auto 40px;
+  }
+
+  .title, .truncate {
+    text-align: center;
+  }
+}

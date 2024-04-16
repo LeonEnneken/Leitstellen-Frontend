@@ -1,0 +1,328 @@
+<div class="flex flex-col w-full min-w-0 sm:absolute sm:inset-0 sm:overflow-hidden">
+  <mat-drawer-container class="flex-auto sm:h-full">
+    <mat-drawer class="sm:w-72 dark:bg-gray-900" [autoFocus]="false" [mode]="drawerMode" [opened]="drawerOpened" #drawer>
+      <div class="flex items-center justify-between m-8 mr-6 sm:my-10">
+        <div class="text-3xl font-semibold tracking-tight leading-8">
+          Rangkonzept
+        </div>
+
+        <div class="lg:hidden">
+          <button mat-icon-button (click)="drawer.close()">
+            <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col divide-y border-t border-b">
+        <ng-container *ngFor="let panel of panels; trackBy: trackByFn">
+          <div class="flex px-8 py-5 cursor-pointer" [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedPanel || selectedPanel !== panel.id, 'bg-primary-50 dark:bg-hover': selectedPanel && selectedPanel === panel.id}" (click)="goToPanel(panel.id)">
+            <div>
+              <div class="font-medium leading-6" [ngClass]="{'text-primary dark:text-primary-500': selectedPanel && selectedPanel === panel.id}">
+                {{panel.title}}
+              </div>
+              <div class="mt-0.5 text-secondary">
+                {{panel.description}}
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </mat-drawer>
+
+    <mat-drawer-content class="flex flex-col">
+      <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <button class="lg:hidden -ml-2" mat-icon-button (click)="drawer.toggle()">
+          <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+
+        <div class="text-3xl font-extrabold tracking-tight">
+          {{getPanelInfo(selectedPanel).title}}
+        </div>
+      </div>
+
+      <div class="flex-auto px-6 pt-9 pb-12 md:p-8 md:pb-12 lg:p-12">     
+        <div class="flex flex-col flex-auto" *ngIf="groups" @fadeIn>
+          <form class="flex flex-col w-full">
+            <div class="flex flex-col sm:flex-row">
+
+              <div class="flex flex-auto flex-wrap">
+                <div class="flex flex-col w-full lg:w-3/5 lg:pr-4">
+                  <mat-form-field class="w-full">
+                    <mat-label>Wähle einen Rang:</mat-label>
+                    <mat-select name="group" [(ngModel)]="selectedGroup">
+                      <mat-option [(value)]="group.id" *ngFor="let group of groups">
+                        {{group.uniqueId}}. {{ group.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="flex flex-col w-full lg:w-2/5 lg:pl-4">
+                  <mat-form-field class="w-full">
+                    <mat-label>Division:</mat-label>
+                    <input matInput name="division" [value]="getGroup()?.division" disabled />
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <ng-container [ngSwitch]="selectedPanel">
+
+          <ng-container *ngSwitchCase="'information'">
+            <div class="flex flex-col items-center p-6 sm:p-10" *ngIf="groups" @fadeIn>
+              <div class="flex flex-col w-full max-w-4xl">
+                <div class="mt-4 sm:mt-4 text-3xl font-bold leading-tight tracking-tight">
+                  Informationen zu dem ausgewählen Rang
+                </div>
+
+                <ng-container *ngIf="!(getGroup()?.data?.servicePowers) && !(getGroup()?.data?.examsNextRank) && !(getGroup()?.data?.additionalPermits)">
+                  <fuse-alert class="my-4 w-full" [appearance]="'border'" [showIcon]="false" [type]="'warning'" [@shake]="true">
+                    <div class="flex justify-center w-full text-center text-lg">
+                      Es wurden keine Informationen zu dem ausgewählten Rang gefunden!
+                    </div>
+                  </fuse-alert>
+                </ng-container>
+
+                <ng-container *ngIf="getGroup()?.data?.servicePowers || getGroup()?.data?.examsNextRank || getGroup()?.data?.additionalPermits">
+                  <mat-accordion class="max-w-4xl mt-8">
+                    <mat-expansion-panel *ngIf="getGroup()?.data?.servicePowers">
+                      <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                        <mat-panel-title class="font-medium leading-tight">
+                          Neue Befugnisse für den Dienst:
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <div [innerHTML]="getDetails(getGroup()?.data?.servicePowers)"></div>
+                    </mat-expansion-panel>
+          
+                    <mat-expansion-panel *ngIf="getGroup()?.data?.examsNextRank">
+                      <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                        <mat-panel-title class="font-medium leading-tight">
+                          Prüfungen/Voraussetzungen für den nächsten Rang:
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <div [innerHTML]="getDetails(getGroup()?.data?.examsNextRank)"></div>
+                    </mat-expansion-panel>
+                    
+                    <mat-expansion-panel *ngIf="getGroup()?.data?.additionalPermits">
+                      <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                        <mat-panel-title class="font-medium leading-tight">
+                          Zusätzliche Genehmigungen:
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <div [innerHTML]="getDetails(getGroup()?.data?.additionalPermits)"></div>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </ng-container>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'equipment'">
+            
+            <ng-container *ngIf="!(getGroup()?.data?.maleClothing) && !(getGroup()?.data?.femaleClothing) && getEquip().length === 0 && !(getGroup()?.data?.bodyArmor)">
+              <fuse-alert class="my-4 w-full p-16" [appearance]="'border'" [showIcon]="false" [type]="'warning'" [@shake]="true">
+                <div class="flex justify-center w-full text-center text-lg">
+                  Es wurden keine Informationen zu dem ausgewählten Rang gefunden!
+                </div>
+              </fuse-alert>
+            </ng-container>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
+              <div class="flex flex-col items-start w-full" *ngIf="getGroup()?.data?.maleClothing">
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Kleiderordnung Männer
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6 text-center">
+                    <div class="flex justify-center">
+                      <img class="images rounded object-cover" [src]="getGroup()?.data?.maleClothing" />
+                    </div>
+
+                    <p class="mt-2" [innerText]="getGroup()?.data?.maleClothingDescription"></p>
+                  </div>
+                </div>
+              </div>
+        
+              <div class="flex flex-col items-start w-full" *ngIf="getGroup()?.data?.femaleClothing">
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Kleiderordnung Frauen
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6 text-center">
+                    <div class="flex justify-center">
+                      <img class="images rounded object-cover" [src]="getGroup()?.data?.femaleClothing" />
+                    </div>
+
+                    <p class="mt-2" [innerText]="getGroup()?.data?.femaleClothingDescription"></p>
+                  </div>
+                </div>
+              </div>
+        
+              <div class="flex flex-col items-start w-full gap-4">
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full" *ngIf="getEquip().length !== 0">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Waffenordnung
+                    </div>
+                    <div class="font-medium text-secondary">
+                      Waffenordnung für den Normalen Betrieb.
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6">
+                    <div class="flex flex-col flex-auto overflow-x-auto">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th class="font-mono text-left">Gegenstand</th>
+                            <th class="font-mono text-center">Anzahl</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let equipment of getEquip()">
+                            <td class="font-mono text-md text-secondary items-center text-left">
+                              {{ equipment.name }}
+                            </td>
+                            <td class="font-mono text-md text-secondary items-center text-center">
+                              {{ equipment.amount }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full" *ngIf="getGroup()?.data?.bodyArmor">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Weste
+                    </div>
+                    <div class="font-medium text-secondary">
+                      Weste für den Normalen Betrieb.
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6">
+                    <div class="flex justify-center">
+                      <img class="images rounded object-cover" [src]="getGroup()?.data?.bodyArmor" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'equipment-event'">
+            
+            <ng-container *ngIf="!(getGroup()?.data?.maleClothingEvent) && !(getGroup()?.data?.femaleClothingEvent) && getEquipEvent().length === 0 && !(getGroup()?.data?.bodyArmorEvent)">
+              <fuse-alert class="my-4 w-full p-16" [appearance]="'border'" [showIcon]="false" [type]="'warning'" [@shake]="true">
+                <div class="flex justify-center w-full text-center text-lg">
+                  Es wurden keine Informationen zu dem ausgewählten Rang gefunden!
+                </div>
+              </fuse-alert>
+            </ng-container>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
+              <div class="flex flex-col items-start w-full" *ngIf="getGroup()?.data?.maleClothingEvent">
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Kleiderordnung Männer
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6 text-center">
+                    <div class="flex justify-center">
+                      <img class="images rounded object-cover" [src]="getGroup()?.data?.maleClothingEvent" />
+                    </div>
+                    
+                    <p class="mt-2" [innerText]="getGroup()?.data?.maleClothingEventDescription"></p>
+                  </div>
+                </div>
+              </div>
+        
+              <div class="flex flex-col items-start w-full" *ngIf="getGroup()?.data?.femaleClothingEvent">
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Kleiderordnung Frauen
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6 text-center">
+                    <div class="flex justify-center">
+                      <img class="images rounded object-cover" [src]="getGroup()?.data?.femaleClothingEvent" />
+                    </div>
+
+                    <p class="mt-2" [innerText]="getGroup()?.data?.femaleClothingEventDescription"></p>
+                  </div>
+                </div>
+              </div>
+        
+              <div class="flex flex-col items-start w-full gap-4">
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full" *ngIf="getEquipEvent().length !== 0">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Waffenordnung
+                    </div>
+                    <div class="font-medium text-secondary">
+                      Waffenordnung für den Event Betrieb.
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6">
+                    <div class="flex flex-col flex-auto overflow-x-auto">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th class="font-mono text-left">Gegenstand</th>
+                            <th class="font-mono text-center">Anzahl</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let equipment of getEquipEvent()">
+                            <td class="font-mono text-md text-secondary items-center text-left">
+                              {{ equipment.name }}
+                            </td>
+                            <td class="font-mono text-md text-secondary items-center text-center">
+                              {{ equipment.amount }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col bg-card shadow rounded-2xl w-full" *ngIf="getGroup()?.data?.bodyArmorEvent">
+                  <div class="flex flex-col m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">
+                      Weste
+                    </div>
+                    <div class="font-medium text-secondary">
+                      Weste für den Event Betrieb.
+                    </div>
+                  </div>
+        
+                  <div class="flex flex-col flex-auto m-6">          
+                    <div class="flex justify-center">
+                      <img class="images rounded object-cover" [src]="getGroup()?.data?.bodyArmorEvent" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</div>

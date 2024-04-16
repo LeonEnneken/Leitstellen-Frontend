@@ -1,0 +1,51 @@
+<div class="flex flex-col flex-auto items-center sm:justify-center min-w-0">
+  <div class="w-full sm:w-auto py-8 px-4 sm:p-12 sm:rounded-2xl sm:shadow sm:bg-card">
+    <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+      
+      <div class="w-full">
+        <img [src]="settings?.logoUrl">
+      </div>
+
+      <mat-divider class="mt-5"></mat-divider>
+
+      <div class="mt-5 text-4xl font-extrabold tracking-tight leading-tight">
+        Einrichtung
+      </div>
+      <div class="flex items-baseline mt-0.5 font-medium">
+        <div>Richte deinen Account ein.</div>
+    </div>
+
+      <form class="mt-8" [formGroup]="form">
+
+        <mat-form-field class="w-full" [floatLabel]="'always'">
+          <mat-label>Deine ID:</mat-label>
+          <input matInput name="id" [formControlName]="'id'" [placeholder]="'4754'" />
+          <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+        </mat-form-field>
+
+        <mat-form-field class="w-full" [floatLabel]="'always'">
+          <mat-label>Dein Vorname:</mat-label>
+          <input matInput name="firstName" [formControlName]="'firstName'" [placeholder]="'Leon'" />
+          <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+        </mat-form-field>
+
+        <mat-form-field class="w-full" [floatLabel]="'always'">
+          <mat-label>Dein Nachname:</mat-label>
+          <input matInput name="lastName" [formControlName]="'lastName'" [placeholder]="'Shorty'" />
+          <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+        </mat-form-field>
+
+        <mat-form-field class="w-full" [floatLabel]="'always'">
+          <mat-label>Deine Telefon Nummer:</mat-label>
+          <input matInput name="phoneNumber" [formControlName]="'phoneNumber'" [placeholder]="'18-70-420'" />
+          <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+        </mat-form-field>
+
+        <button class="fuse-mat-button-large w-full mt-6" mat-flat-button [color]="'primary'" [disabled]="form.disabled" (click)="setupUser()">
+          <span *ngIf="!form.disabled">Speichern und weiter!</span>
+          <mat-progress-spinner *ngIf="form.disabled" [diameter]="24" [mode]="'indeterminate'"></mat-progress-spinner>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

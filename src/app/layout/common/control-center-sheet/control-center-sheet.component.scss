@@ -1,0 +1,74 @@
+a.remove {
+  mat-icon {
+    height: 16px;
+    width: 16px;
+    min-height: 16px;
+    min-width: 16px;
+    position: relative;
+    top: 3px;
+    transition: ease color .5s;
+  }
+}
+
+a.remove:hover {
+  mat-icon {
+    color: rgb(255, 70, 70);
+  }
+}
+
+.control-center {
+  position: relative;
+
+  .self-select {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+  }
+}
+
+.bg-air-force {
+  background-color: rgb(0, 62, 80);
+}
+
+.bg-armor-branch {
+  background-color: rgb(39, 30, 17);
+}
+
+.bg-department-work {
+  background-color: rgb(56, 0, 51);
+}
+
+.bg-general-staff {
+  background-color: rgb(49, 0, 0);
+}
+
+.bg-human-labs,
+.bg-gate-guard,
+.bg-loot-point {
+  background-color: rgb(46, 48, 18);
+}
+
+.bg-basic-military-service,
+.bg-in-training {
+  background-color: rgb(21, 54, 21);
+}
+
+.bg-mobile-support {
+  background-color: rgb(24, 24, 24);
+}
+
+.bg-weapons-convoy {
+  background-color: rgb(39, 21, 34);
+}
+
+.bg-event {
+  background-color: rgba(99, 68, 0, 0.5);
+}
+
+.bg-control-center {
+  background-color: rgba(117, 0, 0, 0.5);
+}
+
+.bg-pause {
+  background-color: rgba(0, 41, 117, 0.5);
+}

@@ -1,0 +1,48 @@
+<button mat-icon-button (click)="openPanel()" #radioCodesOrigin>
+  <mat-icon [svgIcon]="'heroicons_outline:speakerphone'"></mat-icon>
+</button>
+
+<ng-template #radioCodesPanel>
+  <div class="bg-card fixed inset-0 sm:static sm:inset-auto flex flex-col sm:min-w-90 sm:w-90 sm:rounded-2xl overflow-hidden shadow-lg">
+
+    <div class="flex flex-shrink-0 items-center py-4 pr-4 pl-6 bg-primary text-on-primary">
+      <div class="sm:hidden -ml-1 mr-3">
+        <button mat-icon-button (click)="closePanel()">
+          <mat-icon class="icon-size-5 text-current" [svgIcon]="'heroicons_solid:x'"></mat-icon>
+        </button>
+      </div>
+      <div class="text-lg font-medium leading-10">
+        Funk-Codes
+      </div>
+    </div>
+
+    <div class="relative my-4 flex flex-col flex-auto sm:max-h-120 divide-y overflow-y-auto">
+      <div class="flex flex-col flex-auto overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th class="font-mono text-center">Code</th>
+              <th class="font-mono text-center">Beschreibung</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let radioCode of radioCodes">
+              <td class="font-mono text-md text-secondary items-center text-center">
+                <span
+                  class="inline-flex items-center font-bold text-s px-2.5 py-0.5 rounded-full tracking-wide uppercase"
+                  [ngClass]="getRadioCodeStyle(radioCode)">
+                  <span class="leading-relaxed whitespace-nowrap">
+                    {{ radioCode.code }}
+                  </span>
+                </span>
+              </td>
+              <td class="font-mono text-md text-secondary items-center text-center">
+                {{ radioCode.description }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ng-template>

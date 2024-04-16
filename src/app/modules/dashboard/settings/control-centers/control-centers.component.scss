@@ -1,0 +1,24 @@
+.control-centers-grid {
+  grid-template-columns: auto 30px;
+
+  @screen sm {
+    grid-template-columns: 45% 45% 10%;
+  }
+
+  @screen md {
+    grid-template-columns: auto 30% 20% 10%;
+  }
+
+  @screen lg {
+    grid-template-columns: auto 160px 160px 160px 160px 30px;
+  }
+
+  .title, .truncate {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+}

@@ -1,0 +1,19 @@
+.trackings-grid {
+  grid-template-columns: 80px 120px 300px 120px auto;
+
+  @screen sm {
+    grid-template-columns: 80px 120px 300px 120px auto;
+  }
+
+  @screen md {
+    grid-template-columns: 80px 120px 500px 120px auto;
+  }
+
+  @screen lg {
+    grid-template-columns: 80px 120px 500px 120px auto;
+  }
+}
+
+.truncate-center {
+  text-align: center;
+}

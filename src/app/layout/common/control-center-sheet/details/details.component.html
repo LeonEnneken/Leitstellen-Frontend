@@ -1,0 +1,48 @@
+<div class="flex flex-col flex-auto md:w-160 md:min-w-160 -m-6">
+  <div class="m-4" *ngIf="member">
+    <!-- Title -->
+    <div class="border-b mb-4">
+      <input class="w-full p-2 text-2xl" [value]="getName()" disabled />
+    </div>
+
+    <div class="flex flex-auto flex-wrap">
+      <div class="flex flex-col w-full md:w-1/2 sm:px-4">
+        <mat-form-field class="w-full">
+          <mat-label>Rufnummer:</mat-label>
+          <input matInput name="phoneNumber" [value]="member.phoneNumber" disabled />
+        </mat-form-field>
+      </div>
+      <div class="flex flex-col w-full md:w-1/2 sm:px-4">
+        <mat-form-field class="w-full">
+          <mat-label>Rang:</mat-label>
+          <input matInput name="groupId" [value]="getGroup()" disabled />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <hr class="mt-1 mb-3">
+
+    <div class="flex flex-auto flex-wrap">
+      <div class="flex flex-col w-full sm:px-4 mb-2" *ngIf="member.departmentIds.length !== 0">
+        <span>Abteilung:</span>
+      </div>
+  
+      <div class="flex flex-col w-full sm:px-4" [ngClass]="{'lg:w-1/2': member.departmentIds.length !== 1}" *ngFor="let department of member.departmentIds">
+        <mat-form-field class="w-full">
+          <input matInput name="departmentId" [value]="getDepartment(department)" disabled />
+        </mat-form-field>
+      </div>
+    </div>
+    
+    <div class="flex items-end justify-between mt-4">
+      <button mat-flat-button *ngIf="hasPermissions('USER_STATUS_MANAGE')" [color]="'warn'" (click)="patchStatus()">
+        Offline setzen
+      </button>
+
+      <!-- Close -->
+      <button mat-flat-button matDialogClose>
+        Schließen
+      </button>
+    </div>
+  </div>
+</div>

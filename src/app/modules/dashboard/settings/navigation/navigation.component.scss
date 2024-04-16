@@ -1,0 +1,23 @@
+.header-details-grid {
+  grid-template-columns: 120px auto;
+
+  @screen sm {
+    grid-template-columns: 120px auto;
+  }
+
+  @screen md {
+    grid-template-columns: 120px auto;
+  }
+
+  @screen lg {
+    grid-template-columns: 160px auto;
+  }
+
+  .title, .truncate {
+    text-align: center;
+    display: flex !important;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+  }
+}

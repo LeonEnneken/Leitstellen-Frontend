@@ -1,0 +1,23 @@
+
+<div class="w-full search-vehicle">
+  <mat-form-field class="fuse-mat-no-subscript w-full">
+    <input matInput [formControl]="searchControl" [matAutocomplete]="matAutocomplete" [placeholder]="'Suche nach einem Fahrzeug'">
+  </mat-form-field>
+  
+  <mat-autocomplete class="max-h-128 mt-1 rounded" [disableRipple]="true" #matAutocomplete="matAutocomplete">
+    <mat-option class="py-0 px-6 text-md pointer-events-none text-secondary bg-transparent" *ngIf="resultSets && !resultSets.length">
+      Kein Fahrzeug gefunden..
+    </mat-option>
+
+    <mat-option *ngFor="let item of resultSets; trackBy: trackByFn" (click)="select(item)" class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover">
+      <div class="flex flex-col">
+        <div class="truncate leading-normal">
+          {{item.name}}
+        </div>
+        <div class="truncate leading-normal text-sm text-secondary">
+          Kennzeichen: {{item.licensePlate}}
+        </div>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+</div>

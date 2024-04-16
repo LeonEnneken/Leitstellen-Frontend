@@ -1,0 +1,20 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+}
+
+
+::ng-deep {
+  body.dark .mat-flat-button.mat-success {
+    background-color: rgb(22, 163, 74);
+  }
+
+  body.dark .mat-accent .mat-slider-track-fill {
+    background-color: #64748b !important;
+  }
+  body.dark .mat-accent .mat-slider-thumb {
+    background-color: #64748b !important;
+  }
+}

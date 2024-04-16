@@ -1,0 +1,81 @@
+<div class="flex flex-col flex-auto md:w-160 md:min-w-160 -m-6">
+  <div class="m-4">
+
+    <div class="flex flex-auto items-center pb-2 border-b mb-4">
+      <div
+        class="flex items-center justify-center p-2 rounded-full bg-warn-50 text-warn-700 dark:bg-warn dark:text-on-warn">
+        <mat-icon class="text-current" [svgIcon]="'heroicons_outline:exclamation'"></mat-icon>
+      </div>
+      <div class="ml-3 text-lg font-medium leading-5">
+        Hallo {{user?.details?.firstName}} {{user?.details?.lastName}}!
+      </div>
+    </div>
+
+    <div class="flex flex-col divide-y border-b">
+      <fuse-alert class="mb-4" [appearance]="'border'" [type]="'warn'" [showIcon]="false">
+        Sie haben aktuell <b>{{items.length}} Sanktion{{items.length > 1 ? 'en' : ''}}</b> offen. Bitte melden Sie sich bei der <b>HR</b>!
+      </fuse-alert>
+
+      <ng-container *ngFor="let item of items">
+        <div class="flex flex-row items-center justify-between py-4 px-0.5">
+          <div class="flex flex-col">
+            <div class="font-medium">
+              {{item.title}}
+            </div>
+            <div
+              class="flex flex-col sm:flex-row sm:items-center -ml-0.5 mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3">
+              <ng-container *ngIf="item.strikes">
+                <div class="flex items-center">
+                  <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:key'"></mat-icon>
+                  <div class="ml-1.5 text-md text-secondary">
+                    {{item.strikes}} Strikes
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container>
+                <div class="flex items-center">
+                  <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:currency-dollar'"></mat-icon>
+                  <div class="ml-1.5 text-md text-secondary">
+                    {{item.additionalPunishment}}
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="item.createdAt">
+                <div class="flex items-center">
+                  <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
+                  <div class="ml-1.5 text-md text-secondary">
+                    {{item.createdAt | date: "dd.MM.yyyy HH:mm 'Uhr'"}}
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!--
+    <div class="flex flex-auto flex-wrap">
+      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+        <mat-form-field class="w-full">
+          <mat-label>Rufnummer:</mat-label>
+          <input matInput name="phoneNumber" [value]="staff.phoneNumber" disabled />
+        </mat-form-field>
+      </div>
+      <div class="flex flex-col w-full lg:w-1/2 sm:px-2">
+        <mat-form-field class="w-full">
+          <mat-label>Rang:</mat-label>
+          <input matInput name="group" [value]="getGroup()" disabled />
+        </mat-form-field>
+      </div>
+    </div>
+    -->
+
+    <div class="flex items-end justify-end mt-4">
+      <button mat-flat-button matDialogClose [color]="'warn'" (click)="close()">
+        Schließen
+      </button>
+    </div>
+  </div>
+</div>

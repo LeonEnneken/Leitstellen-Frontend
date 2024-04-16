@@ -1,0 +1,16 @@
+.radio-codes-grid {
+  grid-template-columns: 120px 120px auto 80px;
+
+  @screen sm {
+    grid-template-columns: 120px 120px auto 80px;
+  }
+
+  @screen md {
+    grid-template-columns: 120px 120px auto 80px;
+  }
+
+  @screen lg {
+    grid-template-columns: 160px 160px auto 80px;
+  }
+
+}

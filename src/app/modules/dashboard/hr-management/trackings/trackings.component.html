@@ -1,0 +1,132 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+  <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+
+    <div class="text-4xl font-extrabold tracking-tight">
+      Tracking (Gesamt) <small>(Anzahl: {{ trackings?.length || 0 }})</small>
+    </div>
+
+    <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+      <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded min-w-64 mr-4">
+        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+          <input matStartDate formControlName="start" placeholder="Von">
+          <input matEndDate formControlName="end" placeholder="Bis">
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+
+      <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded min-w-64">
+        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:search'"></mat-icon>
+        <input matInput [formControl]="searchInputControl" [autocomplete]="'off'" [placeholder]="'Mitarbeiter suchen..'">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="flex flex-auto items-center justify-center overflow-hidden" *ngIf="loading" @fadeIn>
+    <mat-progress-spinner [diameter]="128" [mode]="'indeterminate'"></mat-progress-spinner>
+  </div>
+
+  <div class="flex flex-auto overflow-hidden" *ngIf="!(loading) && trackings" @fadeIn>
+    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+      <ng-container *ngIf="trackings?.length > 0; else noTrackings">
+        <div class="grid">
+
+          <div class="trackings-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+            <div class="truncate-center">Platz</div>
+            <div class="truncate-center">ID</div>
+            <div>Name</div>
+            <div class="truncate-center">Anzahl Einträge</div>
+            <div class="truncate-center">gesammelte Zeit</div>
+          </div>
+
+          <ng-container *ngFor="let tracking of trackings; let i = index;  trackBy: trackByFn">
+            <div class="trackings-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b" *ngIf="checkSearch(tracking) && tracking?.user" (click)="toggleEdit(tracking.id)">
+              <div class="truncate-center">
+                <b>{{i + 1}}.</b>
+              </div>
+
+              <div class="truncate-center">
+                {{tracking.user.id}}
+              </div>
+
+              <div class="truncate">
+                {{tracking.user.firstName}} {{tracking.user.lastName}}
+              </div>
+
+              <div class="truncate-center">
+                {{tracking.items.length}}
+              </div>
+
+              <div class="truncate-center">
+                {{getTimeSum(tracking)}}
+              </div>
+            </div>
+
+            <div class="grid">
+              <ng-container *ngIf="selected?.id === tracking.id">
+                <ng-container *ngTemplateOutlet="trackingsTemplate; context: {$implicit: tracking}">
+
+                </ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+</div>
+
+
+
+<ng-template #trackingsTemplate let-tracking>
+  <div class="shadow-lg overflow-hidden">
+    <div class="flex border-b">
+      <div class="flex flex-col w-full">
+        <div class="flex flex-col sm:flex-row py-2 px-8 border-b" *ngFor="let tracking of selected.items">
+
+          <div class="flex flex-col w-full justify-between sm:flex-row sm:items-center -ml-0.5 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3">
+            <div class="flex items-center w-full lg:w-1/4">
+              <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:calendar'">
+              </mat-icon>
+              <div class="ml-1.5 text-md text-secondary">
+                {{getControlCenter(tracking)}}
+              </div>
+            </div>
+
+            <div class="flex items-center w-full lg:w-1/4">
+              <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:calendar'">
+              </mat-icon>
+              <div class="ml-1.5 text-md text-secondary">
+                {{tracking.startDate | date: "dd.MM.yyyy 'um' HH:mm 'Uhr'"}}
+              </div>
+            </div>
+
+            <div class="flex items-center w-full lg:w-1/4">
+              <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:calendar'">
+              </mat-icon>
+              <div class="ml-1.5 text-md text-secondary">
+                {{tracking.endDate | date: "dd.MM.yyyy 'um' HH:mm 'Uhr'"}}
+              </div>
+            </div>
+
+            <div class="flex items-center w-full lg:w-1/4">
+              <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:calendar'">
+              </mat-icon>
+              <div class="ml-1.5 text-md text-secondary">
+                {{getTime(tracking.time)}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #noTrackings>
+  <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+    Es wurden keine Einträge gefunden!
+  </div>
+</ng-template>

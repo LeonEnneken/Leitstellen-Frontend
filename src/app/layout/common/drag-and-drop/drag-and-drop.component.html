@@ -1,0 +1,32 @@
+<div class="dropzone" dragAndDrop (fileDropped)="fileBrowseHandler($event)">
+  <ng-container *ngIf="flashMessage.type !== undefined">
+    <fuse-alert class="mt-8 -mb-4" [appearance]="'outline'" [showIcon]="false" [type]="flashMessage.type">
+      {{flashMessage.message}}
+    </fuse-alert>
+  </ng-container>
+
+  <ng-container *ngIf="!(uploaded)">
+    <ng-container *ngIf="flashMessage.type === undefined && submitted">
+      <mat-progress-spinner [diameter]="36" [mode]="'indeterminate'"></mat-progress-spinner>
+    </ng-container>
+
+    <ng-container *ngIf="flashMessage.type === undefined && !(submitted)">
+      <input type="file" #fileDropRef id="fileDropRef" (change)="fileBrowseHandler($event.target.files)" />
+      <img class="icon" src="./assets/icons/cloud-upload.svg" />
+      <h3>Drag and drop</h3>
+      <h3>oder</h3>
+      <label for="fileDropRef">Datei Browser öffnen</label>
+      <p>Maximal 100MB</p>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="uploaded">
+    <a class="preview-link" [href]="uploaded.uri" target="_blank">
+      <img class="preview" [src]="uploaded.uri" />
+    </a>
+
+    <div class="delete" (click)="delete()">
+      <mat-icon class="text-red-500" svgIcon="heroicons_outline:trash"></mat-icon>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,15 @@
+.punishments-grid {
+  grid-template-columns: 40px auto 40px;
+
+  @screen sm {
+    grid-template-columns: 80px auto 72px;
+  }
+
+  @screen md {
+    grid-template-columns: 100px auto 72px;
+  }
+
+  @screen lg {
+    grid-template-columns: 120px auto 72px;
+  }
+}

@@ -1,0 +1,181 @@
+<div class="flex flex-col flex-auto w-full">
+  <div class="bg-card" *ngIf="user">
+    <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
+      <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-4 sm:my-8">
+        <div class="flex flex-auto items-center min-w-0">
+          <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
+            <img class="w-full h-full object-cover" [src]="user?.account?.avatar">
+          </div>
+          <div class="flex flex-col min-w-0 ml-4">
+            <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate">
+              Willkommen zurück,<br class="block md:hidden" /> {{user?.details?.firstName}} {{user?.details?.lastName}}!
+            </div>
+            <div class="ml-1.5 leading-6 truncate text-secondary">
+              Du möchtest an der <b>Leitstellen Software</b> mitwirken oder <b>Feedback</b> geben?<br/><b>Link: </b> <a href="https://dc.grand-roleplay.de">dc.grand-roleplay.de</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-4 md:p-8">
+    <fuse-alert class="mb-4 w-full" [appearance]="'border'" [showIcon]="false" [type]="'warning'" [@shake]="true">
+      <div class="flex justify-center w-full">
+        <a class="text-center text-lg" target="_blank" href="https://donations.grand-roleplay.de">
+          Um die <b>Leitstellen-Systeme</b> am <b>Leben</b> zu behalten und die
+          <b>Server-Kosten</b> decken zu können, lasse doch <b>bitte</b> eine
+          <b>kleine Spende</b> da!<br />
+          Jeder <b>Euro</b> hilft mir dabei die <b>Kosten</b> zu <b>bezahlen</b>.
+          <br />
+          <br />
+          Das <b>Spenden-System</b> sind nun auf eine <b>externe Seite</b> von mir <b>verlagert</b> worden, wo es ein <b>gesamtes Spendenziel</b> für <b>alle Leitstellen</b> gibt!
+          <br />
+          <b>Durch einen Klick auf diese Nachricht, wirst du automatisch weiter geleitet!</b>
+        </a>
+      </div>
+    </fuse-alert>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full">
+
+      <div class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden" *ngIf="hasPermissions('AUDIT_LOGS_SHOW') && hiredTerminated && hiredTerminated?.data?.length !== 0">
+        <div class="flex flex-col p-6 pb-0">
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col">
+              <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">
+                Rekrutierungs-Log
+              </div>
+              <div class="text-secondary font-medium text-sm">
+                Hier werden alle Rekrutierungen und Entlassungen angezeigt!
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start mt-6 max-w-full">
+            <mat-list class="overflow-y-scroll h-80 max-h-80 w-full max-w-full divide-y">
+              <mat-list-item *ngFor="let item of hiredTerminated.data">
+                <div class="flex flex-col max-w-full w-full">
+                  <ng-container [ngSwitch]="item.type">
+                    <ng-container *ngSwitchCase="'MEMBER_HIRED'">
+                      <div class="flex flex-row items-center">
+                        <mat-icon class="text-green-500 mr-2 hidden md:block" [svgIcon]="'heroicons_outline:login'"></mat-icon>
+
+                        <div class="flex flex-col">
+                          <div class="min-w-4 leading-5">
+                            {{item.description}}
+                          </div>
+                          <div class="my-0.5 text-sm font-medium text-secondary mr-3">
+                            {{ item.createdAt | date: 'dd.MM.y HH:mm'}} Uhr
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'MEMBER_TERMINATED'">
+                      <div class="flex flex-row items-center">
+                        <mat-icon class="text-red-500 mr-2 hidden md:block" [svgIcon]="'heroicons_outline:logout'"></mat-icon>
+
+                        <div class="flex flex-col">
+                          <div class="min-w-4 leading-5">
+                            {{item.description}}
+                          </div>
+                          <div class="my-0.5 text-sm font-medium text-secondary mr-3">
+                            {{ item.createdAt | date: 'dd.MM.y HH:mm'}} Uhr
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngSwitchDefault>
+                      {{item.type}}
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </mat-list-item>
+            </mat-list>
+          </div>
+
+          <mat-paginator class="border-b sm:border-b-0 bg-gray-50 dark:bg-transparent" [length]="hiredTerminated.pagination.count" [pageIndex]="hiredTerminated.pagination.page" [pageSize]="hiredTerminated.pagination.per_page" [pageSizeOptions]="[25, 50, 75, 100]" [showFirstLastButtons]="false" (page)="loadHiredTerminatedLogs($event)"></mat-paginator>
+        </div>
+      </div>
+
+      
+      <div class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden" *ngIf="hasPermissions('AUDIT_LOGS_SHOW') && groupsDepartments && groupsDepartments?.data?.length !== 0">
+        <div class="flex flex-col p-6 pb-0">
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col">
+              <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">
+                Rang/Abteilungs-Log
+              </div>
+              <div class="text-secondary font-medium text-sm">
+                Hier werden alle Rang- und Abteilungsänderungen angezeigt!
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start mt-6 max-w-full">
+            <mat-list class="overflow-y-scroll h-80 max-h-80 w-full max-w-full divide-y">
+              <mat-list-item *ngFor="let item of groupsDepartments.data">
+                <div class="flex flex-col max-w-full w-full">
+                  <ng-container [ngSwitch]="item.type">
+                    <ng-container *ngSwitchCase="'MEMBER_PROMOTED'">
+                      <div class="flex flex-row items-center">
+                        <mat-icon class="text-green-500 mr-2 hidden md:block" [svgIcon]="'heroicons_outline:user-add'"></mat-icon>
+
+                        <div class="flex flex-col">
+                          <div class="min-w-4 leading-5">
+                            {{item.description}}
+                          </div>
+                          <div class="my-0.5 text-sm font-medium text-secondary mr-3">
+                            {{ item.createdAt | date: 'dd.MM.y HH:mm'}} Uhr
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'MEMBER_DEMOTED'">
+                      <div class="flex flex-row items-center">
+                        <mat-icon class="text-red-500 mr-2 hidden md:block" [svgIcon]="'heroicons_outline:user-remove'"></mat-icon>
+
+                        <div class="flex flex-col">
+                          <div class="min-w-4 leading-5">
+                            {{item.description}}
+                          </div>
+                          <div class="my-0.5 text-sm font-medium text-secondary mr-3">
+                            {{ item.createdAt | date: 'dd.MM.y HH:mm'}} Uhr
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'MEMBER_DEPARTMENT_PATCHED'">
+                      <div class="flex flex-row items-center">
+                        <mat-icon class="text-amber-500 mr-2 hidden md:block" [svgIcon]="'heroicons_outline:document-add'"></mat-icon>
+
+                        <div class="flex flex-col">
+                          <div class="min-w-4 leading-5">
+                            {{item.description}}
+                          </div>
+                          <div class="my-0.5 text-sm font-medium text-secondary mr-3">
+                            {{ item.createdAt | date: 'dd.MM.y HH:mm'}} Uhr
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngSwitchDefault>
+                      {{item.type}}
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </mat-list-item>
+            </mat-list>
+          </div>
+
+          <mat-paginator class="border-b sm:border-b-0 bg-gray-50 dark:bg-transparent" [length]="groupsDepartments.pagination.count" [pageIndex]="groupsDepartments.pagination.page" [pageSize]="groupsDepartments.pagination.per_page" [pageSizeOptions]="[25, 50, 75, 100]" [showFirstLastButtons]="false" (page)="loadGroupsDepartmentsLogs($event)"></mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

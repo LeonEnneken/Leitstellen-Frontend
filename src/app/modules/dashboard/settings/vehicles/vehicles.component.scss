@@ -1,0 +1,23 @@
+.vehicles-grid {
+  grid-template-columns: 120px auto 120px 80px;
+
+  @screen sm {
+    grid-template-columns: 120px auto 120px 120px 80px;
+  }
+
+  @screen md {
+    grid-template-columns: 120px auto 120px 120px 80px;
+  }
+
+  @screen lg {
+    grid-template-columns: 160px auto 160px 160px 80px;
+  }
+
+  .title, .truncate {
+    text-align: center;
+    display: flex !important;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+  }
+}

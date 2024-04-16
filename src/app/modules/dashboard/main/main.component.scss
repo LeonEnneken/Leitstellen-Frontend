@@ -1,0 +1,37 @@
+.inventory-promotion-grid {
+  grid-template-columns: 60px auto 240px 240px 100px 100px;
+
+  @screen sm {
+    grid-template-columns: 60px auto 240px 240px 100px 100px;
+  }
+
+  @screen md {
+    grid-template-columns: 60px auto 240px 240px 100px 100px;
+  }
+
+  @screen lg {
+    grid-template-columns: 60px auto 240px 240px 100px 100px;
+  }
+
+  .title, .truncate {
+    text-align: center;
+    display: flex !important;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+  }
+}
+
+
+.mat-list-item-content {
+  padding-left: 0px !important;
+}
+
+.mat-list-base .mat-list-item, .mat-list-base .mat-list-option {
+  display: block;
+  min-height: 48px;
+  height: auto !important;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  padding: 4px 0px 4px 0px !important;
+}

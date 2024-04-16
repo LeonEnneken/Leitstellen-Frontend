@@ -1,0 +1,17 @@
+<ng-container *ngIf="flippable">
+  <div class="fuse-card-front">
+    <ng-content select="[fuseCardFront]"></ng-content>
+  </div>
+
+  <div class="fuse-card-back">
+    <ng-content select="[fuseCardBack]"></ng-content>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="!flippable">
+  <ng-content></ng-content>
+
+  <div class="fuse-card-expansion" *ngIf="expanded" [@expandCollapse]>
+    <ng-content select="[fuseCardExpansion]"></ng-content>
+  </div>
+</ng-container>
